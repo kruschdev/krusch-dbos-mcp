@@ -66,7 +66,7 @@ DBOS does not inherently have root access to the host machine. Instead, it deleg
 
 ## 🧠 The Agentic Brain: Infinite Continuity
 
-A native AI IDE (like Antigravity or Claude) suffers from the **"Goldfish Memory"** problem—it loses all context the moment a chat session is cleared. It forgets *why* architectural decisions were made and *how* previous bugs were solved.
+A native AI IDE (like Antigravity, Claude, or Codex) suffers from the **"Goldfish Memory"** problem—it loses all context the moment a chat session is cleared. It forgets *why* architectural decisions were made and *how* previous bugs were solved.
 
 The DBOS ecosystem solves this by connecting the agent to two distinct memory hemispheres:
 
@@ -79,7 +79,7 @@ The DBOS ecosystem solves this by connecting the agent to two distinct memory he
 
 The DBOS Ecosystem treats all intelligence as clients, but the integration pattern differs based on autonomy:
 
-- **IDE Agents (Antigravity, Claude)**: 
+- **IDE Agents (Antigravity, Claude, Codex)**: 
   - **The Human is the Orchestrator.** The developer sits at the wheel. The IDE connects to the DBOS MCP boundaries locally (via `stdio`). The AI acts as an extremely context-aware assistant, pulling from Memory and PG-Git to write code in the developer's active workspace.
 - **Headless Agents (OpenClaw, Hermes, Edge Nodes)**: 
   - **The AI is the Orchestrator.** These agents run completely autonomously in the background. They connect to the **Krusch Agentic Proxy** (via REST) for their LLM reasoning, and to the **DBOS MCP** (via HTTP/SSE) for tool execution. Because they have no human to guide them, they rely entirely on the DBOS capability boundaries for safety and the Memory MCP to maintain their state loops over time.
