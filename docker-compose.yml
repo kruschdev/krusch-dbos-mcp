@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  krusch-dbos-server:
+    build: .
+    container_name: krusch-dbos-server
+    restart: unless-stopped
+    ports:
+      - "3773:3773"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgres://kruschdb:password@db:5432/kruschdb}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434/api/embeddings}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: kruschdb-server
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kruschdb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-kruschdb}
+    volumes:
+      - kruschdb-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-kruschdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kruschdb-postgres-data:

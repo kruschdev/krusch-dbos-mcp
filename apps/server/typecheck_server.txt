@@ -1,0 +1,258 @@
+$ tsc --noEmit
+integration/GeminiAdapter.integration.ts(37,38): warning TS18: Avoid chaining Effect.provide calls, as this can lead to service lifecycle issues. Instead, merge layers and provide them in a single call.    effect(multipleEffectProvide)
+integration/GeminiFibonacci.integration.ts(56,38): warning TS18: Avoid chaining Effect.provide calls, as this can lead to service lifecycle issues. Instead, merge layers and provide them in a single call.    effect(multipleEffectProvide)
+integration/orchestrationEngine.integration.test.ts(185,50): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/orchestrationEngine.integration.test.ts(191,70): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/orchestrationEngine.integration.test.ts(197,69): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/orchestrationEngine.integration.test.ts(201,55): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/providerService.integration.test.ts(41,50): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/providerService.integration.test.ts(45,55): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+integration/providerService.integration.test.ts(49,55): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/bin.ts(13,1): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/bin.ts(15,3): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/bin.ts(15,3): error TS2345: Argument of type '<A, E, R>(self: Effect<A, E, R>) => Effect<A, E, Exclude<R, NetService | NodeServices>>' is not assignable to parameter of type '(_: Effect<void, any, NetService | ServerSettingsService | Environment>) => Effect<unknown, unknown, never>'.
+  Type 'Effect<void, any, ServerSettingsService>' is not assignable to type 'Effect<unknown, unknown, never>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Type 'ServerSettingsService' is not assignable to type 'never'.
+src/cli.test.ts(22,10): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(40,49): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(42,3): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(88,5): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(104,28): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(114,11): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(124,26): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(150,45): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(156,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(156,5): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(156,5): error TS2375: Type 'Effect<void, any, ServerSettingsService>' is not assignable to type 'Effect<void, any, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(160,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(160,5): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(160,5): error TS2375: Type 'Effect<void, any, ServerSettingsService>' is not assignable to type 'Effect<void, any, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(164,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(164,5): error TS2375: Type 'Effect<void, void, ServerSettingsService>' is not assignable to type 'Effect<void, void, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(165,28): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(179,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(179,5): error TS2375: Type 'Effect<void, any, ServerSettingsService>' is not assignable to type 'Effect<void, any, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(183,9): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(190,9): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(207,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(207,5): error TS2375: Type 'Effect<void, any, ServerSettingsService>' is not assignable to type 'Effect<void, any, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(211,9): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(219,9): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(238,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(238,5): error TS2375: Type 'Effect<void, void, ServerSettingsService>' is not assignable to type 'Effect<void, void, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(239,28): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(262,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(262,5): error TS2375: Type 'Effect<void, any, Path | ServerSettingsService>' is not assignable to type 'Effect<void, any, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'Path | ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+      Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+        Types of property 'Service' are incompatible.
+          Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(266,14): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(275,31): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(282,14): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(283,34): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(290,14): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(297,34): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(306,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(306,5): error TS2375: Type 'Effect<void, unknown, Path | ServerSettingsService>' is not assignable to type 'Effect<void, unknown, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'Path | ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+      Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+        Types of property 'Service' are incompatible.
+          Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(312,18): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.test.ts(334,5): error TS1: Missing 'ServerSettingsService' in the expected Effect context.    effect(missingEffectContext)
+src/cli.test.ts(334,5): error TS2375: Type 'Effect<void, void, ServerSettingsService>' is not assignable to type 'Effect<void, void, Scope | NodeServices>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type 'ServerSettingsService' is not assignable to type 'Scope | NodeServices'.
+    Type 'ServerSettingsService' is not assignable to type 'ChildProcessSpawner'.
+      Types of property 'Service' are incompatible.
+        Type 'ServerSettingsShape' is missing the following properties from type '{ spawn(command: Command): Effect<ChildProcessHandle, PlatformError, Scope>; exitCode(command: Command): Effect<...>; streamString(command: Command, options?: { ...; } | undefined): Stream<...>; streamLines(command: Command, options?: { ...; } | undefined): Stream<...>; lines(command: Command, options?: { ...; } | u...': spawn, exitCode, streamString, streamLines, and 2 more.
+src/cli.test.ts(338,28): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(46,10): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(58,10): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(503,7): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(505,3): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(729,11): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(729,33): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(743,28): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(992,5): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1038,5): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1073,5): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1120,19): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1125,34): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1133,5): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/cli.ts(1142,34): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/AgentExecutionEngine.ts(1,1): warning TS48: This project targets Effect v4, but is using Effect v3 APIs. To find the correct API to use, clone and consult the github.com/effect-ts/effect-smol repository for the corresponding v4 replacement.    effect(outdatedApi)
+src/orchestration/Layers/AgentExecutionEngine.ts(13,14): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/AgentExecutionEngine.ts(18,27): error TS2339: Property 'value' does not exist on type 'Option<SqlClient>'.
+  Property 'value' does not exist on type 'None<SqlClient>'.
+src/orchestration/Layers/AgentExecutionEngine.ts(25,7): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/AgentExecutionEngine.ts(32,20): error TS2488: Type 'never' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/orchestration/Layers/AgentExecutionEngine.ts(78,17): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/orchestration/Layers/AgentExecutionEngine.ts(94,27): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/orchestration/Layers/AgentExecutionEngine.ts(142,17): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/orchestration/Layers/AgentExecutionEngine.ts(179,22): warning TS48: forkDaemon is an Effect v3 API, but the project is using Effect v4.    effect(outdatedApi)
+src/orchestration/Layers/AgentExecutionEngine.ts(179,22): error TS2339: Property 'forkDaemon' does not exist on type 'typeof import("/home/agent/homelab/projects/t3code-dbos/node_modules/.bun/effect@4.0.0-beta.45/node_modules/effect/dist/Effect", { with: { "resolution-mode": "import" } })'.
+src/orchestration/Layers/CheckpointReactor.ts(765,11): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/orchestration/Layers/EmbeddingProvider.ts(8,42): error TS2339: Property 'Tag' does not exist on type 'typeof import("/home/agent/homelab/projects/t3code-dbos/node_modules/.bun/effect@4.0.0-beta.45/node_modules/effect/dist/Context", { with: { "resolution-mode": "import" } })'.
+src/orchestration/Layers/EmbeddingProvider.ts(28,37): warning TS36: The 'catch' callback in Effect.tryPromise returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/orchestration/Layers/EmbeddingProvider.ts(55,37): warning TS36: The 'catch' callback in Effect.tryPromise returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/orchestration/Layers/EmbeddingProvider.ts(81,37): warning TS36: The 'catch' callback in Effect.tryPromise returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/orchestration/Layers/OrchestrationEngine.ts(116,12): message TS16: Chained pipe calls can be simplified to a single pipe call    effect(unnecessaryPipeChain)
+src/orchestration/Layers/OrchestrationEngine.ts(291,7): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/orchestration/Layers/ProviderCommandReactor.test.ts(248,19): message TS16: Chained pipe calls can be simplified to a single pipe call    effect(unnecessaryPipeChain)
+src/orchestration/Layers/VectorEmbeddingWorker.ts(5,14): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/VectorEmbeddingWorker.ts(10,11): warning TS28: This has unknown in the requirements channel which is not recommended.
+Only service identifiers should appear in the requirements channel.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/VectorEmbeddingWorker.ts(28,11): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/Layers/VectorEmbeddingWorker.ts(31,13): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/orchestration/Layers/VectorEmbeddingWorker.ts(94,26): warning TS28: This has unknown in the requirements channel which is not recommended.
+Only service identifiers should appear in the requirements channel.    effect(anyUnknownInErrorContext)
+src/orchestration/runtimeLayer.ts(8,10): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/runtimeLayer.ts(30,14): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/orchestration/runtimeLayer.ts(33,3): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/persistence/Layers/Postgres.ts(9,3): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionPendingApprovals.ts(108,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadActivities.ts(115,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadActivities.ts(153,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadMessages.ts(111,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadMessages.ts(135,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadProposedPlans.ts(89,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadProposedPlans.ts(110,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadSessions.ts(88,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreadSessions.ts(105,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreads.ts(124,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionThreads.ts(142,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionTurns.ts(261,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionTurns.ts(276,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionTurns.ts(306,7): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionTurns.ts(349,7): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/persistence/Layers/ProjectionTurns.ts(361,5): message TS5: This Effect.gen contains a single return statement.    effect(unnecessaryEffectGen)
+src/project/mcpConfig.ts(40,31): warning TS36: The 'catch' callback in Effect.try returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/provider/Layers/ClaudeAdapter.ts(968,9): error TS2322: Type 'unknown' is not assignable to type 'EmbeddingProviderSvc | null'.
+src/provider/Layers/CodexAdapter.ts(1327,9): error TS2322: Type 'unknown' is not assignable to type 'EmbeddingProviderSvc | null'.
+src/provider/Layers/CursorAdapter.ts(294,11): error TS2322: Type 'unknown' is not assignable to type 'EmbeddingProviderSvc | null'.
+src/provider/Layers/GeminiAdapter.ts(86,13): error TS2322: Type 'unknown' is not assignable to type 'EmbeddingProviderSvc | null'.
+src/provider/Layers/GeminiAdapter.ts(228,26): warning TS36: The 'catch' callback in Effect.tryPromise returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/provider/Layers/GeminiAdapter.ts(255,27): message TS32: Using Effect.runFork inside an Effect is not recommended. The same services should generally be used instead to run child effects.
+    Consider extracting the current services by using for example Effect.services and then use Effect.runForkWith with the extracted services instead.    effect(runEffectInsideEffect)
+src/provider/Layers/GeminiAdapter.ts(294,43): warning TS36: The 'catch' callback in Effect.tryPromise returns global 'Error', which loses type safety as untagged errors merge together. Consider using a tagged error and optionally wrapping the original in a 'cause' property.    effect(globalErrorInEffectCatch)
+src/provider/Layers/GeminiAdapter.ts(329,27): message TS15: Avoid using try/catch inside Effect generators. Use Effect's error handling mechanisms instead (e.g. Effect.try, Effect.tryPromise, Effect.catch, Effect.catchTag).    effect(tryCatchInEffectGen)
+src/provider/Layers/OpenCodeAdapter.ts(449,13): error TS2322: Type 'unknown' is not assignable to type 'EmbeddingProviderSvc | null'.
+src/server.ts(46,10): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(71,10): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(134,7): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(141,22): warning TS28: This has unknown in the requirements channel and unknown in the error channel which is not recommended.
+Only service identifiers should appear in the requirements channel.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(233,7): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(235,22): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(238,7): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(238,33): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(242,22): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(261,7): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(262,22): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(287,14): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(331,26): warning TS28: This has unknown in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(341,14): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+src/server.ts(341,26): warning TS28: This has any in the error channel which is not recommended.
+Having an unknown or any error type is not useful. Consider instead using specific error types baked by Data.TaggedError for example.    effect(anyUnknownInErrorContext)
+error: script "typecheck" exited with code 1

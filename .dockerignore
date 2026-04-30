@@ -1,0 +1,10 @@
+node_modules
+.git
+.turbo
+dist
+.plans
+.docs
+.t3
+worktrees
+userdata
+test_output.log
