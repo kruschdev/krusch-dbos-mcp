@@ -1126,13 +1126,13 @@ const runServerCommand = (
   });
 
 const startCommand = Command.make("start", { ...sharedServerCommandFlags }).pipe(
-  Command.withDescription("Run the T3 Code server."),
+  Command.withDescription("Run the Krusch DBOS server."),
   Command.withHandler((flags) => runServerCommand(flags)),
 );
 
 const serveCommand = Command.make("serve", { ...sharedServerCommandFlags }).pipe(
   Command.withDescription(
-    "Run the T3 Code server without opening a browser and print headless pairing details.",
+    "Run the Krusch DBOS server without opening a browser and print headless pairing details.",
   ),
   Command.withHandler((flags) =>
     runServerCommand(flags, {
@@ -1143,7 +1143,7 @@ const serveCommand = Command.make("serve", { ...sharedServerCommandFlags }).pipe
 );
 
 export const cli = Command.make("t3", { ...sharedServerCommandFlags }).pipe(
-  Command.withDescription("Run the T3 Code server."),
+  Command.withDescription("Run the Krusch DBOS server."),
   Command.withHandler((flags) => runServerCommand(flags)),
   Command.withSubcommands([startCommand, serveCommand, authCommand, projectCommand]),
 );

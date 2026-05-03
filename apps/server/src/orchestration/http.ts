@@ -60,10 +60,11 @@ export const orchestrationSnapshotRouteLayer = HttpRouter.add(
       status: 200,
     });
   }).pipe(
-    Effect.catchTag("OrchestrationDispatchCommandError", (err) => {
-      console.error("DISPATCH CAUSE:", err.cause);
-      return respondToOrchestrationHttpError(err);
-    }),
+    Effect.catchTag("OrchestrationDispatchCommandError", (err) =>
+      Effect.logError("Dispatch cause", err.cause).pipe(
+        Effect.flatMap(() => respondToOrchestrationHttpError(err))
+      )
+    ),
     Effect.catchTag("OrchestrationGetSnapshotError", respondToOrchestrationHttpError),
   ),
 );
@@ -75,13 +76,12 @@ export const orchestrationDispatchRouteLayer = HttpRouter.add(
     yield* authenticateOwnerSession;
     const orchestrationEngine = yield* OrchestrationEngineService;
     const command = yield* HttpServerRequest.schemaBodyJson(ClientOrchestrationCommand).pipe(
-      Effect.mapError((cause) => {
-        console.error(cause.message);
-        return new OrchestrationDispatchCommandError({
+      Effect.mapError((cause) =>
+        new OrchestrationDispatchCommandError({
           message: "Invalid orchestration command payload.",
           cause,
-        });
-      }),
+        })
+      ),
     );
     const normalizedCommand = yield* normalizeDispatchCommand(command);
     const result = yield* orchestrationEngine.dispatch(normalizedCommand).pipe(
@@ -95,10 +95,11 @@ export const orchestrationDispatchRouteLayer = HttpRouter.add(
     );
     return HttpServerResponse.jsonUnsafe(result, { status: 200 });
   }).pipe(
-    Effect.catchTag("OrchestrationDispatchCommandError", (err) => {
-      console.error("DISPATCH CAUSE:", err.cause);
-      return respondToOrchestrationHttpError(err);
-    }),
+    Effect.catchTag("OrchestrationDispatchCommandError", (err) =>
+      Effect.logError("Dispatch cause", err.cause).pipe(
+        Effect.flatMap(() => respondToOrchestrationHttpError(err))
+      )
+    ),
   ),
 );
 
@@ -173,9 +174,10 @@ export const orchestrationVectorSearchRouteLayer = HttpRouter.add(
 
     return HttpServerResponse.jsonUnsafe({ results }, { status: 200 });
   }).pipe(
-    Effect.catchTag("OrchestrationDispatchCommandError", (err) => {
-      console.error("DISPATCH CAUSE:", err.cause);
-      return respondToOrchestrationHttpError(err);
-    }),
+    Effect.catchTag("OrchestrationDispatchCommandError", (err) =>
+      Effect.logError("Dispatch cause", err.cause).pipe(
+        Effect.flatMap(() => respondToOrchestrationHttpError(err))
+      )
+    ),
   ),
 );

@@ -100,7 +100,7 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
               Effect.logError(`Failed to embed event ${row.event_id}`, cause),
             ),
           ),
-        { concurrency: "unbounded" },
+        { concurrency: 3 },
       );
     });
 

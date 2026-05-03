@@ -7,6 +7,7 @@ import {
   otlpTracesProxyRouteLayer,
   serverEnvironmentRouteLayer,
   browserApiCorsLayer,
+  fleetQueueRouteLayer,
 } from "./http.ts";
 import { fixPath } from "./os-jank.ts";
 import { websocketRpcRouteLayer } from "./ws.ts";
@@ -279,7 +280,8 @@ export const makeRoutesLayer = Layer.mergeAll(
   serverEnvironmentRouteLayer,
   websocketRpcRouteLayer,
   mcpSseRouteLayer,
-  mcpMessagesRouteLayer
+  mcpMessagesRouteLayer,
+  fleetQueueRouteLayer
 ).pipe(Layer.provide(browserApiCorsLayer));
 
 export const makeServerLayer = Layer.unwrap(

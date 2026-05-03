@@ -90,7 +90,7 @@ Synthesize the primary failure mode into ONE concise Nugget string. If no issues
       yield* Effect.logInfo(`[HALO Optimizer] Generating nomic embedding for nugget...`);
       const embedding = yield* embeddingProvider.getEmbedding(nugget);
       
-      if (!Array.isArray(embedding)) {
+      if (!Array.isArray(embedding) || embedding.length === 0) {
         yield* Effect.logError("[HALO Optimizer] Failed to generate embedding for nugget.");
         return;
       }
@@ -100,20 +100,7 @@ Synthesize the primary failure mode into ONE concise Nugget string. If no issues
 
       yield* Effect.logInfo(`[HALO Optimizer] Saving nugget to native DBOS orchestration_nuggets table...`);
 
-      // Attempt to ensure table exists (Postgres/PGVector syntax handled implicitly if using postgres backend)
-      try {
-        yield* sql`
-          CREATE TABLE IF NOT EXISTS orchestration_nuggets (
-            id SERIAL PRIMARY KEY,
-            content TEXT NOT NULL,
-            embedding vector NOT NULL,
-            created_at_ms BIGINT NOT NULL
-          )
-        `;
-      } catch (e) {
-        // ignore
-      }
-
+      // Table is managed by migration 030_OrchestrationNuggets
       yield* sql`
         INSERT INTO orchestration_nuggets (content, embedding, created_at_ms)
         VALUES (${nugget}, ${vectorStr}::vector, ${now})

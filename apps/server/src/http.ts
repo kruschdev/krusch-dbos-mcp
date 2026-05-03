@@ -23,12 +23,20 @@ import { BrowserTraceCollector } from "./observability/Services/BrowserTraceColl
 import { ServerAuth } from "./auth/Services/ServerAuth.ts";
 import { respondToAuthError } from "./auth/http.ts";
 import { ServerEnvironment } from "./environment/Services/ServerEnvironment.ts";
+import { AgentExecutionQueue } from "./persistence/Services/AgentExecutionQueue.ts";
 
 
 const OTLP_TRACES_PROXY_PATH = "/api/observability/v1/traces";
 const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "::1", "localhost"]);
 
 export const browserApiCorsLayer = HttpRouter.cors({
+  allowedOrigins: [
+    "http://localhost:3773",
+    "http://localhost:5733",
+    "http://127.0.0.1:3773",
+    "http://127.0.0.1:5733",
+    "tauri://localhost",
+  ],
   allowedMethods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["authorization", "b3", "traceparent", "content-type"],
   maxAge: 600,
@@ -65,6 +73,17 @@ export const serverEnvironmentRouteLayer = HttpRouter.add(
     );
     return HttpServerResponse.jsonUnsafe(descriptor, { status: 200 });
   }),
+);
+
+export const fleetQueueRouteLayer = HttpRouter.add(
+  "GET",
+  "/api/fleet/queue",
+  Effect.gen(function* () {
+    yield* requireAuthenticatedRequest;
+    const queueService = yield* AgentExecutionQueue;
+    const jobs = yield* queueService.list();
+    return HttpServerResponse.jsonUnsafe({ jobs }, { status: 200 });
+  }).pipe(Effect.catchTag("AuthError", respondToAuthError)),
 );
 
 class DecodeOtlpTraceRecordsError extends Data.TaggedError("DecodeOtlpTraceRecordsError")<{

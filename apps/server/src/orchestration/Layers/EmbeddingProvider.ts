@@ -40,24 +40,31 @@ export const EmbeddingProviderLive = Layer.effect(
             });
 
             if (!response.ok) {
-              throw new Error(`Ollama returned status ${response.status}`);
+              return yield* Effect.fail(new Error(`Ollama returned status ${response.status}`));
             }
 
-            const json = (yield* Effect.tryPromise(() => response.json())) as any;
+            const json = (yield* Effect.tryPromise({
+              try: () => response.json(),
+              catch: (err) => new Error(`Ollama JSON parse failed: ${err}`),
+            })) as any;
             return json.embedding;
           }
 
           if (selection.provider === "gemini") {
             const apiKey = selection.apiKey;
             if (!apiKey) {
-              throw new Error("Gemini API key is required for embeddings");
+              return yield* Effect.fail(new Error("Gemini API key is required for embeddings"));
             }
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${selection.model}:embedContent?key=${apiKey}`;
+            // Use header-based auth instead of leaking the key in the URL query string
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${selection.model}:embedContent`;
             const response = yield* Effect.tryPromise({
               try: () =>
                 fetch(url, {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": apiKey,
+                  },
                   body: JSON.stringify({
                     content: { parts: [{ text }] },
                   }),
@@ -66,17 +73,20 @@ export const EmbeddingProviderLive = Layer.effect(
             });
 
             if (!response.ok) {
-              throw new Error(`Gemini returned status ${response.status}`);
+              return yield* Effect.fail(new Error(`Gemini returned status ${response.status}`));
             }
 
-            const json = (yield* Effect.tryPromise(() => response.json())) as any;
+            const json = (yield* Effect.tryPromise({
+              try: () => response.json(),
+              catch: (err) => new Error(`Gemini JSON parse failed: ${err}`),
+            })) as any;
             return json.embedding.values;
           }
 
           if (selection.provider === "openai") {
             const apiKey = selection.apiKey;
             if (!apiKey) {
-              throw new Error("OpenAI API key is required for embeddings");
+              return yield* Effect.fail(new Error("OpenAI API key is required for embeddings"));
             }
             const url = "https://api.openai.com/v1/embeddings";
             const response = yield* Effect.tryPromise({
@@ -96,16 +106,20 @@ export const EmbeddingProviderLive = Layer.effect(
             });
 
             if (!response.ok) {
-              throw new Error(`OpenAI returned status ${response.status}`);
+              return yield* Effect.fail(new Error(`OpenAI returned status ${response.status}`));
             }
 
-            const json = (yield* Effect.tryPromise(() => response.json())) as any;
+            const json = (yield* Effect.tryPromise({
+              try: () => response.json(),
+              catch: (err) => new Error(`OpenAI JSON parse failed: ${err}`),
+            })) as any;
             return json.data[0].embedding;
           }
 
-          throw new Error(`Unsupported embedding provider: ${selection.provider}`);
+          return yield* Effect.fail(new Error(`Unsupported embedding provider: ${selection.provider}`));
         }),
     };
     return service;
   }),
 );
+

@@ -1,6 +1,6 @@
 # Krusch DBOS MCP Agent Context
 
-> **Project Origin**: A highly-concurrent, horizontally scalable agentic coding environment retrofitted from the original T3 Code web UI. This repository implements a Database-Oriented Operating System (DBOS) architecture.
+> **Project Origin**: A highly-concurrent, horizontally scalable agentic coding environment retrofitted from the original Krusch DBOS web UI. This repository implements a Database-Oriented Operating System (DBOS) architecture.
 
 ## ⚠️ Hazards & Critical Safety Rules
 

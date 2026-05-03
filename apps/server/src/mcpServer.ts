@@ -4,6 +4,8 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { GitStatusBroadcaster } from "./git/Services/GitStatusBroadcaster.ts";
+import { ServerAuth } from "./auth/Services/ServerAuth.ts";
+import { respondToAuthError } from "./auth/http.ts";
 
 // Effect-native SSE Transport implementation
 class EffectSseTransport {
@@ -76,7 +78,9 @@ function createMcpServerForTransport(transport: EffectSseTransport) {
     });
 
     // server.connect returns a promise, we must run it in Effect
-    yield* Effect.promise(() => server.connect(transport).catch(console.error));
+    yield* Effect.promise(() => server.connect(transport)).pipe(
+      Effect.catchCause((cause) => Effect.logError("MCP server connect failed", cause))
+    );
     return server;
   });
 }
@@ -85,6 +89,11 @@ export const mcpSseRouteLayer = HttpRouter.add(
   "GET",
   "/mcp/sse",
   Effect.gen(function* () {
+    // Authenticate the incoming request
+    const request = yield* HttpServerRequest.HttpServerRequest;
+    const serverAuth = yield* ServerAuth;
+    yield* serverAuth.authenticateHttpRequest(request);
+
     const sessionId = crypto.randomUUID();
     const queue = yield* Queue.unbounded<string>();
     const transport = new EffectSseTransport(sessionId, queue);
@@ -111,14 +120,18 @@ export const mcpSseRouteLayer = HttpRouter.add(
         "Connection": "keep-alive"
       }
     });
-  })
+  }).pipe(Effect.catchTag("AuthError", respondToAuthError))
 );
 
 export const mcpMessagesRouteLayer = HttpRouter.add(
   "POST",
   "/mcp/messages",
   Effect.gen(function* () {
+    // Authenticate the incoming request
     const request = yield* HttpServerRequest.HttpServerRequest;
+    const serverAuth = yield* ServerAuth;
+    yield* serverAuth.authenticateHttpRequest(request);
+
     // URL parsing from request
     const urlStr = request.url;
     // Extract sessionId from search params
@@ -140,5 +153,5 @@ export const mcpMessagesRouteLayer = HttpRouter.add(
     }
 
     return HttpServerResponse.text("Accepted", { status: 202 });
-  })
+  }).pipe(Effect.catchTag("AuthError", respondToAuthError))
 );

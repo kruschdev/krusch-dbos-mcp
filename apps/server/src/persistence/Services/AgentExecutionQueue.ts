@@ -14,6 +14,10 @@ export interface AgentExecutionQueueShape {
   readonly offer: (job: AgentExecutionJob) => Effect.Effect<void, PersistenceSqlError>;
   readonly take: () => Effect.Effect<Option.Option<{ job: AgentExecutionJob; startedAtMs: number }>, PersistenceSqlError>;
   readonly complete: (jobId: string) => Effect.Effect<void, PersistenceSqlError>;
+  readonly list: () => Effect.Effect<
+    { jobId: string; threadId: ThreadId; jobType: string; status: string; startedAtMs: number; pickedAtMs: number | null }[],
+    PersistenceSqlError
+  >;
 }
 
 export class AgentExecutionQueue extends Context.Service<
@@ -93,6 +97,24 @@ export const AgentExecutionQueueLive = Layer.effect(
         Effect.asVoid,
       );
 
-    return { offer, take, complete } satisfies AgentExecutionQueueShape;
+    const list: AgentExecutionQueueShape["list"] = () => Effect.gen(function* () {
+      const rows = yield* sql<{ job_id: string; thread_id: string; job_type: string; status: string; started_at_ms: string; picked_at_ms: string | null }>`
+        SELECT job_id, thread_id, job_type, status, started_at_ms, picked_at_ms
+        FROM agent_execution_queue
+        ORDER BY started_at_ms DESC
+      `.pipe(
+        Effect.catchTag("SqlError", (e) => Effect.fail(toPersistenceSqlError("AgentExecutionQueue.list")(e))),
+      );
+      return rows.map((row) => ({
+        jobId: row.job_id,
+        threadId: row.thread_id as ThreadId,
+        jobType: row.job_type,
+        status: row.status,
+        startedAtMs: parseInt(row.started_at_ms, 10),
+        pickedAtMs: row.picked_at_ms ? parseInt(row.picked_at_ms, 10) : null,
+      }));
+    });
+
+    return { offer, take, complete, list } satisfies AgentExecutionQueueShape;
   })
 );
