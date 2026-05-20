@@ -13,18 +13,32 @@ An ultra-concurrent, horizontally scalable agentic coding infrastructure built e
 ![Effect](https://img.shields.io/badge/Effect--TS-Strict-blue.svg)
 ![DB](<https://img.shields.io/badge/Database-PostgreSQL%20(pgvector)-lightgrey.svg>)
 
-## 🧠 Why a Database Operating System (DBOS)?
+## 🧠 What Problem Does This Solve?
 
-Traditional AI coding assistants are fundamentally local, single-player applications. If you attempt to connect autonomous agents directly to your system, you risk massive concurrency failures, out-of-sync context, and severe security vulnerabilities (e.g., agents executing destructive terminal commands).
+Traditional AI agent workflows suffer from three critical structural flaws:
+1. **The "Goldfish Memory" Context Problem**: Ephemeral execution loops mean an agent starting a new session has absolute amnesia. It has no memory of why custom architectures exist, where database volumes reside, or what specific testing constraints are required.
+2. **Concurrency & Coordination Chaos**: When multiple autonomous agents run simultaneously, they lack a shared synchronization plane. They run over each other’s file edits, trigger race conditions in database locks, or duplicate expensive computation.
+3. **The "Shadow MCP" Security Threat**: Granting agents raw shell or unchecked tool access exposes host systems to devastating risks. There is no centralized boundary to auditably gate and restrict destructive actions.
 
-**Krusch DBOS MCP** transforms local AI execution into a **distributed agentic engine**. By migrating orchestration logic out of ephemeral memory and into a highly robust, transactional relational database (PostgreSQL), the database itself operates as the state machine and message bus. Every agent's thought process, tool execution, and architectural plan becomes a persistent, ACID-compliant database transaction.
+**Krusch DBOS MCP** solves these bottlenecks by transforming ephemeral AI execution into an **ACID-compliant, database-driven operating system**. By migrating the orchestration logic and state machines out of memory and into a high-performance PostgreSQL backend (leveraging the NVMe SSD storage), all agent reasoning, queuing, and tool routing are persisted as auditable relational transactions.
 
-### What critical bottlenecks does this solve?
+---
 
-1. **The "Shadow MCP" Security Risk**: Allowing agents direct access to raw MCP servers creates massive security blind spots. DBOS acts as a **Zero-Trust Capability Boundary**. Agents only interact with DBOS, which safely routes requests to backend servers (like Infra MCP) that explicitly block destructive commands.
-2. **State Loss & Resilience Failures**: If an agent crashes during a 50-step reasoning loop, traditional memory is lost. In Krusch DBOS MCP, every atomic step is persisted. If a compute node loses power, the active transaction is cleanly rolled back, and the `SKIP LOCKED` queue releases the job for resumption.
-3. **Context Amnesia ("Goldfish Memory")**: DBOS natively integrates an asynchronous `VectorEmbeddingWorker` powered by `pgvector`. It stores every agent decision and shell command into a temporal-decayed vector database, allowing agents to instantly recall architectural context across infinite sessions.
-4. **Self-Healing Agent Loops (HALO)**: DBOS natively runs the **[Hierarchical Agent Loop Optimizer (HALO)](https://github.com/context-labs/halo)**. A background worker continuously sweeps execution traces using a local Ollama LLM to identify systemic agent failures, synthesizing them into behavioral "[Nuggets]" (credit to [NeoVertex1/nuggets](https://github.com/NeoVertex1/nuggets) for the memory storage concept) that gently steer future agent logic.
+## 🚀 Why Use It as Part of Our System?
+
+Within our developer and homelab ecosystem, **Krusch DBOS MCP** acts as the central **Swarm Coordinator**. You should always use it as the anchor of our development stack because:
+
+### 1. Mandatory Context Anchoring (Zero-Trust memory)
+DBOS integrates directly with the **`krusch-context-mcp`** memory plane. Under our **Zero-Trust Context Verification** rule, every agent is strictly forbidden from guessing context. By executing a Vector VDB query on start, the agent pulls active codebase realities, nightly lessons, and trace histories—eliminating hallucinations and ensuring total continuity.
+
+### 2. High-Performance concurrency (`SKIP LOCKED` queues)
+Instead of blocking or leaking resources, agents communicate through native, low-latency queues. Multi-agent deployments use PG `SELECT ... FOR UPDATE SKIP LOCKED` to pull tasks cleanly and safely, ensuring that execution tasks are completed exactly-once without lock contention.
+
+### 3. Closed-Loop Self-Healing (HALO Loop)
+The integrated `HaloOptimizerService` runs a local-first trace sweep. If an agent fails a task, the HALO optimizer synthesizes the execution failure into an actionable, durable behavioral nudge (a "**Nugget**") stored in the database. When the agent resumes or a new agent takes over, the model is dynamically steered away from repeating the same mistake.
+
+### 4. Zero-Trust Security Gateway
+All interactions pass through the DBOS Capability Gateway. Dangerous operations are isolated, programmatically logged to the database plane prior to dispatch, and securely routed to boundary agents that explicitly forbid destructive actions.
 
 ## 🤝 Swarm Orchestration (Ecosystem Synergy)
 
