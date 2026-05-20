@@ -51,6 +51,18 @@ Krusch DBOS MCP is the central orchestration router of the KruschDev ecosystem. 
 
 > 🗺️ **Want to see the big picture?** Read [The Krusch Stack Ecosystem](./ECOSYSTEM.md) for a complete diagram of how the LLM Proxy, DBOS, and all MCP boundaries fit together.
 
+## 🧠 Centralized Proxy Routing & Pinned Model Strategy
+
+To prevent GPU VRAM memory thrashing and latency spikes caused by constant model weight swapping (e.g., swapping between code-generation, critic, and agent execution model parameters), the system supports a standardized **model pinning strategy** coupled with a high-performance **routing proxy**:
+
+1. **Standardized Model Selection**:
+   - Swarm configurations can standardize on a designated **primary inference model** (e.g., a balanced 8B or 9B parameter model).
+   - Pinning a primary model to dedicated hardware interfaces ensures the weights reside permanently in VRAM, eliminating loading overhead and enabling sub-second inference turnarounds.
+
+2. **Unified Routing Proxy**:
+   - All HTTP/SSE completions traffic is dispatched to a centralized **gateway proxy** (e.g., configured via the `OLLAMA_URL` endpoint).
+   - The proxy acts as a centralized gatekeeper that dynamically routes standard swarm tasks over the local network to primary high-performance inference nodes, while reserving auxiliary compute interfaces for heavy code-generation tasks or specialized model profiles.
+
 ## 🛡️ Agent Guardrails & Secure Access
 
 If you connect a headless agent to the DBOS MCP, **it does not get unrestricted root access to your computer**. The system is built around strict security protocols:
@@ -108,6 +120,18 @@ The backend exposes a standard Model Context Protocol interface:
 ## 🏗️ Architecture
 
 For a deep dive into the DBOS queuing model and sequence diagrams, please read [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+## 📦 Maintenance & Migrations
+
+### Namespace Migration Checklist (T3 -> KD)
+
+To prevent namespace drift and ensure consistency across the homelab when migrating legacy T3 references to the KD (kruschdev) standard, ensure the following steps are followed:
+
+- [ ] **Rename Dotfiles**: Migrate root namespace folders (e.g., `.t3` -> `.kd`).
+- [ ] **Standardize ENV Variables**: Prefix all custom environment variables with `KD_`.
+- [ ] **Update Project Configs**: Scan `package.json`, `docker-compose.yml`, and `systemd` services for old namespace strings.
+- [ ] **Check Telemetry Logs**: Ensure telemetry tools correctly enumerate all modified files during migrations.
+- [ ] **Pre-commit Validation**: Run a full test and lint suite (`bun run test`) before committing namespace changes.
 
 ## License
 

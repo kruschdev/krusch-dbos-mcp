@@ -62,6 +62,33 @@ graph TD
     D -->|"Rich Semantic History"| E
 ```
 
+### Model Routing & VRAM Optimization
+
+To guarantee consistent, ultra-low-latency agentic turns, DBOS decouples direct LLM calls from execution environments by routing all requests through a centralized API gateway proxy using a strictly partitioned hardware weight distribution:
+
+- **Weight Swapping Avoidance**: Standardizing all core swarm tasks (Agent Executors, Critics, Ideators, and Synthesizers) on a designated **primary inference model** pins the weights in active GPU memory. The underlying inference engine never has to discard layers from VRAM to load different parameter shapes.
+- **Dynamic Cascade Routing**: All outbound model completions requests target the API gateway proxy. The proxy identifies the requested model and delegates it dynamically across the infrastructure:
+  - **Standardized Tasks (Primary Inference Model)**: Routed natively to a high-performance primary inference node with dedicated VRAM.
+  - **Specialized Tasks (e.g., Code Gen or Complex Reasoning)**: Routed to auxiliary compute nodes or dedicated edge processors.
+
+```mermaid
+graph TD
+    subgraph Client Execution Layer
+        A["Swarm Clients / DBOS Workers"] -->|"POST /v1/chat/completions"| B("API Gateway Proxy")
+    end
+
+    subgraph Intelligent Routing Layer
+        B -->|"Analyze Model Request"| C{"Cascade Router"}
+        C -->|"Standard Swarm Task"| D["Primary Inference Node (Dedicated VRAM)"]
+        C -->|"Specialized Task"| E["Auxiliary Compute Node (Edge Processing)"]
+    end
+
+    subgraph GPU Memory Optimization
+        D -->|"Pinned Weights (No Swap)"| F[("Inference VRAM Pool")]
+        E -->|"Ad-hoc Loading"| G[("Auxiliary VRAM Pool")]
+    end
+```
+
 ## 3. Data Model
 
 The core relational data model revolves around:
