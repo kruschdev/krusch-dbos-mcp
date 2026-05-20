@@ -169,7 +169,7 @@ export class ServerConfig extends Context.Service<ServerConfig, ServerConfigShap
           noBrowser: false,
           startupPresentation: "browser",
           databaseUrl:
-            process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/t3code",
+            process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/kdcode",
           geminiApiKey: process.env.GEMINI_API_KEY,
           ollamaUrl: process.env.OLLAMA_URL || "http://localhost:11434/api/embeddings",
         } satisfies ServerConfigShape;

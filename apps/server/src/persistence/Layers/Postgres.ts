@@ -14,8 +14,10 @@ const setup = Layer.effectDiscard(
 export const makePgPersistenceLive = Effect.fn("makePgPersistenceLive")(function* (
   databaseUrl: string,
 ) {
+  const maxPoolConnections = parseInt(process.env.DB_POOL_MAX || "50", 10);
   const pgLayer = PgClient.layer({
     url: Redacted.make(databaseUrl),
+    maxConnections: maxPoolConnections,
     spanAttributes: {
       "service.name": "kd-server",
     },
@@ -31,7 +33,7 @@ export const makePgPersistenceLive = Effect.fn("makePgPersistenceLive")(function
 export const PostgresPersistenceLayerLive = Layer.unwrap(
   Effect.map(Effect.service(ServerConfig), ({ databaseUrl }) => {
     const url =
-      databaseUrl || process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code";
+      databaseUrl || process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode";
     return makePgPersistenceLive(url);
   }),
 );
