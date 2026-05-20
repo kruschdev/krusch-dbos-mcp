@@ -75,8 +75,21 @@ The core relational data model revolves around:
 - **Interface**: Model Context Protocol (MCP) via HTTP/SSE
 - **Database**: PostgreSQL (with `pgvector` extension)
 - **Build / Tooling**: Bun (used for dependency management and execution)
+- **Local Directory Standard**: The orchestrator defaults to the local `~/.kd` home directory for configuration caches and session records, successfully migrating away from legacy `t3` structures to align with the unified ecosystem namespace.
 
-## 5. Deployment
+## 5. Storage Tiering & Performance
+
+To guarantee sub-millisecond database execution and rapid vector similarity searches, the persistence layer uses high-performance storage:
+- **NVMe SSD Storage**: All Docker containers, event logs, and the PostgreSQL database (specifically the `kruschdb-postgres-data` volume) reside on the high-speed NVMe SSD mounted at `/mnt/nvme/docker` on `kruschdev`. 
+- **Latency Optimization**: By configuring Docker's `"data-root"` directly on the NVMe layer, disk I/O and vector search read/writes are optimized for zero-latency, highly concurrent operations.
+
+## 6. Connectivity & Well-Known Seams
+
+Clients discover server settings, features, and endpoints dynamically:
+- **Environment Descriptor (`GET /.well-known/kd/environment`)**: An unauthenticated, public endpoint that provides the active client routing descriptor, server versioning, and environment status.
+- **SSE Streaming Gateway (`GET /mcp/sse`)**: Connects headless swarms via robust Server-Sent Events, streaming tool activities and status blocks.
+
+## 7. Deployment
 
 The backend can be easily containerized and distributed via `docker-compose`.
 

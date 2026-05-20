@@ -84,5 +84,10 @@ The DBOS Ecosystem treats all intelligence as clients, but the integration patte
 - **Headless Agents (OpenClaw, Hermes, Edge Nodes)**: 
   - **The AI is the Orchestrator.** These agents run completely autonomously in the background. They connect to the **Krusch Agentic Proxy** (via REST) for their LLM reasoning, and to the **DBOS MCP** (via HTTP/SSE) for tool execution. Because they have no human to guide them, they rely entirely on the DBOS capability boundaries for safety and the Memory MCP to maintain their state loops over time.
 
-### The Foundation (Shared Tooling)
-To maintain security and stability across a distributed ecosystem, it is highly recommended to glue everything together with internal shared utility libraries. This guarantees that every node and standalone app utilizes the exact same authentication middleware, database connection pooling, and streaming logic.
+### The Foundation (Shared Tooling & Storage)
+
+To maintain absolute architectural safety and sub-millisecond persistence performance across our distributed nodes, the ecosystem relies on key foundation standards:
+
+1. **The Shared Utility Libraries**: Anchored by unified utility platforms, ensuring that every standalone app, MCP server, and edge node shares identical authentication middleware, relational connection pools (`@effect/sql-pg`), and SSE streaming contracts.
+2. **Unified NVMe SSD Persistence Plan**: The core relational engine, docker containers, and the vector embedding indices (`kruschdb-postgres-data` volume) are physically mounted on the high-speed NVMe SSD (`/mnt/nvme/docker` on `kruschdev`). This guarantees high-throughput parallel execution of transactional `SKIP LOCKED` queues and ultra-low-latency similarity searches.
+3. **The `.kd` Configuration Namespace**: All system configurations, active databases, logs, and caches reside cleanly under the local `~/.kd` namespace, completing the transition away from legacy `t3` namespaces for complete ecosystem brand alignment.
