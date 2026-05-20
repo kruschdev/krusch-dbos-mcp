@@ -289,13 +289,16 @@ export function makeGeminiAdapterLive(options?: GeminiAdapterLiveOptions) {
                     geminiConfig?.apiEndpoint || "https://generativelanguage.googleapis.com/v1beta";
                   const model =
                     input.modelSelection?.model || context.session.model || "gemini-3.1-pro";
-                  const url = `${baseUrl}/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
+                  const url = `${baseUrl}/models/${model}:streamGenerateContent?alt=sse`;
 
                   const response = yield* Effect.tryPromise({
                     try: () =>
                       fetch(url, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { 
+                          "Content-Type": "application/json",
+                          "x-goog-api-key": apiKey
+                        },
                         body: JSON.stringify({
                           contents: [{ role: "user", parts: [{ text: prompt }] }],
                         }),

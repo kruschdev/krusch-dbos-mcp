@@ -16,7 +16,7 @@ description: Pause krusch-dbos-mcp and save semantic state
    - Include Fragile files, concrete Next Steps, and any transient state.
 
 3. **Log Activity**:
-   - Execute `mcp_homelab-memory_mcp_homelab-memory_add` with `category: 'activity'` and content: `[krusch-dbos-mcp] <description>`.
+   - Execute `krusch_context_add_memory` with `category: 'activity'` and content: `[krusch-dbos-mcp] <description>`.
 
 4. **Save Steering Facts**:
    - Store any new patterns via `mcp_nuggets-memory_remember` with `kind: 'project'`, key prefixed `krusch-dbos-mcp:`.

@@ -135,7 +135,7 @@ export const EmbeddingSelection = Schema.Struct({
   provider: EmbeddingProviderKind.pipe(
     Schema.withDecodingDefault(Effect.succeed("ollama" as const)),
   ),
-  model: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed("nomic-embed-text"))),
+  model: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed("bge-large"))),
   apiEndpoint: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed(""))),
   apiKey: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed(""))),
 });
@@ -159,7 +159,7 @@ export const ServerSettings = Schema.Struct({
     Schema.withDecodingDefault(
       Effect.succeed({
         provider: "ollama" as const,
-        model: "nomic-embed-text",
+        model: "bge-large",
       }),
     ),
   ),

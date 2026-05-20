@@ -10,7 +10,7 @@ export default Effect.gen(function* () {
     CREATE TABLE IF NOT EXISTS orchestration_event_embeddings (
       event_id TEXT PRIMARY KEY,
       content TEXT NOT NULL,
-      embedding vector(768) NOT NULL,
+      embedding vector(1024) NOT NULL,
       created_at_ms BIGINT NOT NULL
     )
   `;

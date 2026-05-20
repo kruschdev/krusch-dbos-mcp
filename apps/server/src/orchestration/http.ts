@@ -13,6 +13,7 @@ import { OrchestrationEngineService } from "./Services/OrchestrationEngine.ts";
 import { ProjectionSnapshotQuery } from "./Services/ProjectionSnapshotQuery.ts";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 import { ServerConfig } from "../config.ts";
+import { ServerSettingsService } from "../serverSettings.ts";
 
 const respondToOrchestrationHttpError = (
   error: OrchestrationDispatchCommandError | OrchestrationGetSnapshotError,
@@ -119,14 +120,20 @@ export const orchestrationVectorSearchRouteLayer = HttpRouter.add(
     );
 
     const config = yield* Effect.service(ServerConfig);
-    const OLLAMA_URL = config.ollamaUrl;
+    const settingsService = yield* ServerSettingsService;
+    const settings = yield* settingsService.getSettings;
+    const selection = settings.embeddingModelSelection;
+    const modelName = selection.provider === "ollama" ? selection.model : "bge-large";
+    const ollamaEndpoint = (selection.provider === "ollama" && selection.apiEndpoint)
+      ? selection.apiEndpoint
+      : config.ollamaUrl;
 
     const response = yield* Effect.tryPromise({
       try: () =>
-        fetch(OLLAMA_URL, {
+        fetch(ollamaEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: "nomic-embed-text", prompt: body.query }),
+          body: JSON.stringify({ model: modelName, prompt: body.query }),
         }),
       catch: (cause) =>
         new OrchestrationDispatchCommandError({

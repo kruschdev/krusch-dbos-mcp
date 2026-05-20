@@ -7,6 +7,37 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
     const sql = yield* SqlClient.SqlClient;
     const provider = yield* EmbeddingProvider;
 
+    // Detect actual dimension from active provider by fetching a test embedding on worker startup
+    const testEmbedding = yield* provider.getEmbedding("test").pipe(
+      Effect.catchAll(() => Effect.succeed([]))
+    );
+
+    let detectedDimension = 1024; // default to bge-large standard
+    if (testEmbedding.length > 0) {
+      detectedDimension = testEmbedding.length;
+      yield* Effect.logInfo(`Detected embedding dimension: ${detectedDimension}`);
+
+      const colInfo = yield* sql<{ atttypmod: number }>`
+        SELECT atttypmod FROM pg_attribute 
+        WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'orchestration_event_embeddings' LIMIT 1)
+        AND attname = 'embedding'
+      `.pipe(Effect.catchAll(() => Effect.succeed([])));
+
+      if (colInfo.length > 0 && colInfo[0].atttypmod !== detectedDimension) {
+        yield* Effect.logWarning(
+          `Embedding dimension mismatch: Database expects ${colInfo[0].atttypmod}, but provider generates ${detectedDimension}. Re-aligning database...`
+        );
+        yield* sql`DROP INDEX IF EXISTS idx_orch_event_embeddings_embedding`;
+        yield* sql`TRUNCATE TABLE orchestration_event_embeddings`;
+        yield* sql`ALTER TABLE orchestration_event_embeddings ALTER COLUMN embedding TYPE vector(${detectedDimension})`;
+        yield* sql`
+          CREATE INDEX IF NOT EXISTS idx_orch_event_embeddings_embedding 
+          ON orchestration_event_embeddings USING hnsw (embedding vector_cosine_ops)
+        `;
+        yield* Effect.logInfo("Database embedding dimension realigned successfully.");
+      }
+    }
+
     const processBatch = Effect.gen(function* () {
       // Find up to 10 events that don't have embeddings yet
       const rows = yield* sql<{ sequence: number; event_id: string; payload_json: string; aggregate_kind: string; stream_id: string }>`
@@ -65,7 +96,7 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
 
             const embedding = yield* provider.getEmbedding(content);
 
-            if (!Array.isArray(embedding)) {
+            if (!Array.isArray(embedding) || embedding.length !== detectedDimension) {
               return;
             }
 

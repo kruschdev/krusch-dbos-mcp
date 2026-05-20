@@ -80,6 +80,8 @@ const makeOrchestrationEngine = Effect.gen(function* () {
   const projectionPipeline = yield* OrchestrationProjectionPipeline;
   const projectionSnapshotQuery = yield* ProjectionSnapshotQuery;
   const commandQueueService = yield* OrchestrationCommandQueue;
+  const retryCount = yield* Config.number("ORCHESTRATION_RETRY_COUNT").pipe(Config.withDefault(50));
+  const retryDelayMs = yield* Config.number("ORCHESTRATION_RETRY_DELAY_MS").pipe(Config.withDefault(100));
 
   let readModel = createEmptyReadModel(new Date().toISOString());
   const engineLock = yield* Semaphore.make(1);
@@ -213,7 +215,9 @@ const makeOrchestrationEngine = Effect.gen(function* () {
         Effect.withSpan(`orchestration.command.${envelope.command.type}`),
         Effect.retry({
           while: (e) => e._tag === "PersistenceSqlError" || e._tag === "OrchestrationCommandInvariantError",
-          schedule: Schedule.spaced(Duration.millis(100)).pipe(Schedule.both(Schedule.recurs(50))),
+          schedule: Schedule.spaced(Duration.millis(retryDelayMs)).pipe(
+            Schedule.both(Schedule.recurs(retryCount)),
+          ),
         }),
         Effect.exit
       )
@@ -248,7 +252,7 @@ const makeOrchestrationEngine = Effect.gen(function* () {
           }
 
           const error = Cause.squash(exit.cause) as OrchestrationDispatchError;
-          console.error("processEnvelope failed:", error);
+          yield* Effect.logError("processEnvelope failed: " + String(error));
           if (!Schema.is(OrchestrationCommandPreviouslyRejectedError)(error)) {
             yield* reconcileReadModelAfterDispatchFailure.pipe(
               Effect.catch(() =>
@@ -263,19 +267,17 @@ const makeOrchestrationEngine = Effect.gen(function* () {
               ),
             );
 
-            if (Schema.is(OrchestrationCommandInvariantError)(error)) {
-              yield* commandReceiptRepository
-                .upsert({
-                  commandId: envelope.command.commandId,
-                  aggregateKind: aggregateRef.aggregateKind,
-                  aggregateId: aggregateRef.aggregateId,
-                  acceptedAt: new Date().toISOString(),
-                  resultSequence: readModel.snapshotSequence,
-                  status: "rejected",
-                  error: error.message,
-                })
-                .pipe(Effect.catch(() => Effect.void));
-            }
+            yield* commandReceiptRepository
+              .upsert({
+                commandId: envelope.command.commandId,
+                aggregateKind: aggregateRef.aggregateKind,
+                aggregateId: aggregateRef.aggregateId,
+                acceptedAt: new Date().toISOString(),
+                resultSequence: readModel.snapshotSequence,
+                status: "rejected",
+                error: (error as any).message || String(error),
+              })
+              .pipe(Effect.catch(() => Effect.void));
           }
         }),
       ),
@@ -290,10 +292,10 @@ const makeOrchestrationEngine = Effect.gen(function* () {
       let commandOpt;
       try {
         commandOpt = yield* commandQueueService.take().pipe(
-          Effect.tapError(err => Effect.sync(() => console.error("commandQueueService.take failed:", err)))
+          Effect.tapError(err => Effect.logError("commandQueueService.take failed: " + String(err)))
         );
       } catch (e) {
-        console.error("Worker synchronous error:", e);
+        yield* Effect.logError("Worker synchronous error: " + String(e));
         yield* Effect.sleep(Duration.millis(1000));
         return;
       }
@@ -321,6 +323,11 @@ const makeOrchestrationEngine = Effect.gen(function* () {
 
   const dispatch: OrchestrationEngineShape["dispatch"] = (command) =>
     Effect.gen(function* () {
+      yield* sql`
+        DELETE FROM orchestration_command_receipts
+        WHERE command_id = ${command.commandId} AND status = 'rejected'
+      `.pipe(Effect.catch(() => Effect.void));
+
       yield* commandQueueService.offer(command);
 
       while (true) {
