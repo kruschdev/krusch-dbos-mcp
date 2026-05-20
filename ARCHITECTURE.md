@@ -75,7 +75,7 @@ The core relational data model revolves around:
 - **Interface**: Model Context Protocol (MCP) via HTTP/SSE
 - **Database**: PostgreSQL (with `pgvector` extension)
 - **Build / Tooling**: Bun (used for dependency management and execution)
-- **Local Directory Standard**: The orchestrator defaults to the local `~/.kd` home directory for configuration caches and session records, successfully migrating away from legacy `t3` structures to align with the unified ecosystem namespace.
+- **Local Directory Standard**: The orchestrator defaults to the local `~/.kd` home directory for configuration caches and session records, aligning with the unified ecosystem namespace.
 
 ## 5. Storage Tiering & Performance
 
