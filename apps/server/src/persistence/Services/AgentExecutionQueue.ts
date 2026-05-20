@@ -1,7 +1,7 @@
 import { Context, Effect, Option, Layer, Clock } from "effect";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 import { toPersistenceSqlError, PersistenceSqlError } from "../Errors.ts";
-import { ThreadId } from "@t3tools/contracts";
+import { ThreadId } from "@kd/contracts";
 
 export interface AgentExecutionJob {
   readonly jobId: string;

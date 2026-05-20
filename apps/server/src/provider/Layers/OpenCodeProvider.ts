@@ -3,7 +3,7 @@ import type {
   OpenCodeSettings,
   ServerProvider,
   ServerProviderModel,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import { Cause, Data, Effect, Equal, Layer, Stream } from "effect";
 
 import { ServerConfig } from "../../config.ts";

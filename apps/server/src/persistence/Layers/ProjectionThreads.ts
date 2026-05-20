@@ -11,7 +11,7 @@ import {
   ProjectionThreadRepository,
   type ProjectionThreadRepositoryShape,
 } from "../Services/ProjectionThreads.ts";
-import { ModelSelection, ProjectId } from "@t3tools/contracts";
+import { ModelSelection, ProjectId } from "@kd/contracts";
 import { ProjectionProjectRepository } from "../Services/ProjectionProjects.ts";
 import { ProjectionProjectRepositoryLive } from "./ProjectionProjects.ts";
 

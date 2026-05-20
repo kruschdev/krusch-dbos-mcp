@@ -5,8 +5,8 @@ import {
   TextGenerationError,
   type ChatAttachment,
   type OpenCodeModelSelection,
-} from "@t3tools/contracts";
-import { sanitizeBranchFragment, sanitizeFeatureBranchName } from "@t3tools/shared/git";
+} from "@kd/contracts";
+import { sanitizeBranchFragment, sanitizeFeatureBranchName } from "@kd/shared/git";
 
 import { ServerConfig } from "../../config.ts";
 import { resolveAttachmentPath } from "../../attachmentStore.ts";

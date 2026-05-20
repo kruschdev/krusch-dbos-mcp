@@ -16,7 +16,7 @@ import { ProjectionThreadRepository } from "../Services/ProjectionThreads.ts";
 import { ProjectionThreadRepositoryLive } from "./ProjectionThreads.ts";
 import { ProjectionProjectRepository } from "../Services/ProjectionProjects.ts";
 import { ProjectionProjectRepositoryLive } from "./ProjectionProjects.ts";
-import { ThreadId } from "@t3tools/contracts";
+import { ThreadId } from "@kd/contracts";
 
 const makeProjectionPendingApprovalRepository = Effect.gen(function* () {
   const sql = yield* SqlClient.SqlClient;

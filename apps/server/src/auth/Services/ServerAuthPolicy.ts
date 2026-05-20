@@ -1,4 +1,4 @@
-import type { ServerAuthDescriptor } from "@t3tools/contracts";
+import type { ServerAuthDescriptor } from "@kd/contracts";
 import { Context } from "effect";
 import type { Effect } from "effect";
 

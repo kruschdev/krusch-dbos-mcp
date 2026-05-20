@@ -13,7 +13,7 @@ import {
   OrchestrationThreadActivityTone,
   ThreadId,
   TurnId,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import { Schema, Context } from "effect";
 import type { Effect } from "effect";
 

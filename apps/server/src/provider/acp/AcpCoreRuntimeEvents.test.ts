@@ -1,4 +1,4 @@
-import { RuntimeRequestId, TurnId } from "@t3tools/contracts";
+import { RuntimeRequestId, TurnId } from "@kd/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

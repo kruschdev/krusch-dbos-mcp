@@ -1,6 +1,6 @@
 import { Context, Effect, Option, Layer, Clock } from "effect";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
-import { OrchestrationCommand } from "@t3tools/contracts";
+import { OrchestrationCommand } from "@kd/contracts";
 import { toPersistenceSqlError, PersistenceSqlError } from "../Errors.ts";
 
 export interface OrchestrationCommandQueueShape {

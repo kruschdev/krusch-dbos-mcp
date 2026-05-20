@@ -68,7 +68,7 @@ bun run dev:server --migrate
 
 ### 3. Connect Your Agents
 
-You can dynamically add downstream MCP servers to DBOS by editing the `~/.t3/mcp.json` file. DBOS will automatically discover them, aggregate their safe tools, and present a unified capability list to any connected MCP client.
+You can dynamically add downstream MCP servers to DBOS by editing the `~/.kd/mcp.json` file. DBOS will automatically discover them, aggregate their safe tools, and present a unified capability list to any connected MCP client.
 
 ---
 

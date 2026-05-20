@@ -17,7 +17,7 @@ export const makePgPersistenceLive = Effect.fn("makePgPersistenceLive")(function
   const pgLayer = PgClient.layer({
     url: Redacted.make(databaseUrl),
     spanAttributes: {
-      "service.name": "t3-server",
+      "service.name": "kd-server",
     },
   });
 

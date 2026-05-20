@@ -21,7 +21,7 @@ import {
   type RuntimeMode,
   type ThreadId,
   TurnId,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import {
   DateTime,
   Deferred,

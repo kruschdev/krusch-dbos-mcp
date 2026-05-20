@@ -19,7 +19,7 @@ import {
   ResolvedKeybindingsConfig,
   THREAD_JUMP_KEYBINDING_COMMANDS,
   type ServerConfigIssue,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import type { Mutable } from "effect/Types";
 import {
   Array,
@@ -46,7 +46,7 @@ import {
 } from "effect";
 import * as Semaphore from "effect/Semaphore";
 import { ServerConfig } from "./config.ts";
-import { fromLenientJson } from "@t3tools/shared/schemaJson";
+import { fromLenientJson } from "@kd/shared/schemaJson";
 
 type WhenToken =
   | { type: "identifier"; value: string }

@@ -16,7 +16,7 @@ import {
   OrchestrationCheckpointStatus,
   ThreadId,
   TurnId,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import { Option, Schema, Context } from "effect";
 import type { Effect } from "effect";
 

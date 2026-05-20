@@ -6,7 +6,7 @@ import {
   ProviderKind,
   type OrchestrationEvent,
   type OrchestrationThread,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import {
   Effect,
   Exit,
@@ -97,7 +97,7 @@ const initializeGitWorkspace = Effect.fn(function* (cwd: string) {
   runGit(cwd, ["config", "user.name", "Test User"]);
   const fileSystem = yield* FileSystem.FileSystem;
   const { join } = yield* Path.Path;
-  yield* fileSystem.writeFileString(join(cwd, ".gitignore"), ".t3/\n");
+  yield* fileSystem.writeFileString(join(cwd, ".gitignore"), ".kd/\n");
   yield* fileSystem.writeFileString(join(cwd, "README.md"), "v1\n");
   runGit(cwd, ["add", "."]);
   runGit(cwd, ["commit", "-m", "Initial"]);

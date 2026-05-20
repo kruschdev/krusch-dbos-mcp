@@ -79,7 +79,7 @@ import {
   orchestrationSnapshotRouteLayer,
   orchestrationVectorSearchRouteLayer,
 } from "./orchestration/http.ts";
-import { NetService } from "@t3tools/shared/Net";
+import { NetService } from "@kd/shared/Net";
 
 const PtyAdapterLive = Layer.unwrap(
   Effect.gen(function* () {

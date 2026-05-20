@@ -13,7 +13,7 @@ import {
   ProviderKind,
   ThreadId,
   ModelSelection,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 import { describe, it } from "@effect/vitest";
 import { Effect, Option, Schema, Scope } from "effect";
 

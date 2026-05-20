@@ -1,8 +1,8 @@
 import { Effect, Layer, Result, Schema, SchemaIssue } from "effect";
-import { TrimmedNonEmptyString } from "@t3tools/contracts";
+import { TrimmedNonEmptyString } from "@kd/contracts";
 
 import { runProcess } from "../../processRunner.ts";
-import { GitHubCliError } from "@t3tools/contracts";
+import { GitHubCliError } from "@kd/contracts";
 import {
   GitHubCli,
   type GitHubRepositoryCloneUrls,

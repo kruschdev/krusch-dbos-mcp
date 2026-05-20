@@ -3,8 +3,8 @@ import type {
   OrchestrationReadModel,
   ProjectId,
   ThreadId,
-} from "@t3tools/contracts";
-import { OrchestrationCommand } from "@t3tools/contracts";
+} from "@kd/contracts";
+import { OrchestrationCommand } from "@kd/contracts";
 import * as Semaphore from "effect/Semaphore";
 import {
   Cause,

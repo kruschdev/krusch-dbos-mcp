@@ -1,4 +1,4 @@
-import { AuthClientMetadataDeviceType, AuthSessionId } from "@t3tools/contracts";
+import { AuthClientMetadataDeviceType, AuthSessionId } from "@kd/contracts";
 import { Option, Schema, Context } from "effect";
 import type { Effect } from "effect";
 

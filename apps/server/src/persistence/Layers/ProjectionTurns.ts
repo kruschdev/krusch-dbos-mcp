@@ -1,4 +1,4 @@
-import { OrchestrationCheckpointFile, ThreadId } from "@t3tools/contracts";
+import { OrchestrationCheckpointFile, ThreadId } from "@kd/contracts";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 import * as SqlSchema from "effect/unstable/sql/SqlSchema";
 import { Effect, Layer, Option, Schema, Struct } from "effect";

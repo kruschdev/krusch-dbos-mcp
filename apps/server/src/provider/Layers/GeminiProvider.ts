@@ -1,4 +1,4 @@
-import type { ServerProvider, ServerProviderModel } from "@t3tools/contracts";
+import type { ServerProvider, ServerProviderModel } from "@kd/contracts";
 import { Effect, Layer, Stream, Equal, Duration } from "effect";
 
 import { ServerSettingsService } from "../../serverSettings.ts";

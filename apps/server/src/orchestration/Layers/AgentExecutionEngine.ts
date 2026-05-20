@@ -1,5 +1,5 @@
 import { Effect, Layer, Duration, Option } from "effect";
-import { CommandId, MessageId, ThreadId, TurnId } from "@t3tools/contracts";
+import { CommandId, MessageId, ThreadId, TurnId } from "@kd/contracts";
 import { AgentExecutionQueue } from "../../persistence/Services/AgentExecutionQueue.ts";
 import { OrchestrationEngineService } from "../Services/OrchestrationEngine.ts";
 import { fetchRAGContext } from "../../provider/Layers/RAGContext.ts";

@@ -154,7 +154,7 @@ export class ServerConfig extends Context.Service<ServerConfig, ServerConfigShap
           otlpTracesUrl: undefined,
           otlpMetricsUrl: undefined,
           otlpExportIntervalMs: 10_000,
-          otlpServiceName: "t3-server",
+          otlpServiceName: "kd-server",
           cwd,
           baseDir,
           ...derivedPaths,

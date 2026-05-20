@@ -4,7 +4,7 @@ import {
   OrchestrationCommandQueue,
 } from "../src/persistence/Services/OrchestrationCommandQueue.ts";
 import { makePgPersistenceLive } from "../src/persistence/Layers/Postgres.ts";
-import { CommandId, ProjectId, OrchestrationCommand } from "@t3tools/contracts";
+import { CommandId, ProjectId, OrchestrationCommand } from "@kd/contracts";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 
 // Configuration for local postgres testing

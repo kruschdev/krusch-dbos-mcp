@@ -9,7 +9,7 @@ export const makeTestPgPersistenceLive = Effect.fn("makeTestPgPersistenceLive")(
   const pgLayer = PgClient.layer({
     url: Redacted.make(databaseUrl),
     maxConnections: 20,
-    spanAttributes: { "service.name": "t3-server-test" },
+    spanAttributes: { "service.name": "kd-server-test" },
   });
 
   const setup = Layer.effectDiscard(

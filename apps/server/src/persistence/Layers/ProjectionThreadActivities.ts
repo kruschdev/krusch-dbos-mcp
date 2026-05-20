@@ -1,4 +1,4 @@
-import { NonNegativeInt, ThreadId } from "@t3tools/contracts";
+import { NonNegativeInt, ThreadId } from "@kd/contracts";
 import { Effect, Layer, Schema, Struct, Option } from "effect";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 import * as SqlSchema from "effect/unstable/sql/SqlSchema";

@@ -28,7 +28,7 @@
   "scripts": {
     "dev": "bun scripts/dev-runner.ts dev",
     "dev:server": "bun scripts/dev-runner.ts dev:server",
-    "start": "turbo run start --filter=t3",
+    "start": "turbo run start --filter=kd",
     "start:mock-update-server": "node scripts/mock-update-server.ts",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
@@ -36,7 +36,7 @@
     "test": "turbo run test",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "build:contracts": "turbo run build --filter=@t3tools/contracts",
+    "build:contracts": "turbo run build --filter=@kd/contracts",
     "release:smoke": "node scripts/release-smoke.ts",
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/dist packages/*/dist .turbo apps/*/.turbo packages/*/.turbo",
     "sync:vscode-icons": "node scripts/sync-vscode-icons.mjs"

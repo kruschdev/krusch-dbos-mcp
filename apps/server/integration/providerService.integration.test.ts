@@ -1,7 +1,7 @@
-import type { ProviderRuntimeEvent, ModelSelection } from "@t3tools/contracts";
+import type { ProviderRuntimeEvent, ModelSelection } from "@kd/contracts";
 import { ServerConfig } from "../src/config.ts";
-import { MessageId, ThreadId } from "@t3tools/contracts";
-import { DEFAULT_SERVER_SETTINGS } from "@t3tools/contracts/settings";
+import { MessageId, ThreadId } from "@kd/contracts";
+import { DEFAULT_SERVER_SETTINGS } from "@kd/contracts/settings";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { it } from "@effect/vitest";
 import assert from "node:assert/strict";

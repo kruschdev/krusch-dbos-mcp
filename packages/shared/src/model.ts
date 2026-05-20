@@ -11,7 +11,7 @@ import {
   type GeminiModelOptions,
   type ProviderKind,
   type ProviderModelOptions,
-} from "@t3tools/contracts";
+} from "@kd/contracts";
 
 export interface SelectableModelOption {
   slug: string;

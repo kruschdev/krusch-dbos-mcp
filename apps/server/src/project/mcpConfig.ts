@@ -38,15 +38,15 @@ const loadConfig = (configPath: string) =>
   }).pipe(Effect.orElseSucceed(() => ({} as Record<string, any>)));
 
 /**
- * Reads `.t3/mcp.json` from the global home directory and the provided workspace root,
+ * Reads `.kd/mcp.json` from the global home directory and the provided workspace root,
  * merges them (local overrides global), and parses into an array of ACP-compliant McpServer definitions.
  */
 export const readMcpServersConfig = (
   workspaceRoot: string,
 ): Effect.Effect<ReadonlyArray<McpServer>, never, never> =>
   Effect.gen(function* () {
-    const globalConfigPath = Path.join(os.homedir(), ".t3", "mcp.json");
-    const localConfigPath = Path.join(workspaceRoot, ".t3", "mcp.json");
+    const globalConfigPath = Path.join(os.homedir(), ".kd", "mcp.json");
+    const localConfigPath = Path.join(workspaceRoot, ".kd", "mcp.json");
 
     const globalServers = yield* loadConfig(globalConfigPath);
     const localServers = yield* loadConfig(localConfigPath);
