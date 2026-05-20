@@ -87,7 +87,7 @@ The backend exposes a standard Model Context Protocol interface:
 
 - `GET /mcp/sse`: Connects autonomous agents (like OpenClaw) to the DBOS MCP Server via Server-Sent Events (SSE).
 - `POST /mcp/messages`: Receives and executes JSON-RPC tool messages from MCP clients.
-- `GET /.well-known/t3/environment`: Emits public server configuration and routing capabilities.
+- `GET /.well-known/kd/environment`: Emits public server configuration and routing capabilities.
 
 ---
 
