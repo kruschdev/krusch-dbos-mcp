@@ -2,6 +2,8 @@ import * as NodeHttp from "node:http";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { beforeEach, it as vitestIt } from "vitest";
+import * as SqlClient from "effect/unstable/sql/SqlClient";
 
 import * as NodeHttpServer from "@effect/platform-node/NodeHttpServer";
 import * as NodeServices from "@effect/platform-node/NodeServices";
@@ -78,7 +80,7 @@ const makeCliTestServerConfig = (baseDir: string) =>
       desktopBootstrapToken: undefined,
       autoBootstrapProjectFromCwd: false,
       logWebSocketEvents: false,
-      databaseUrl: process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code",
+      databaseUrl: process.env.DATABASE_URL || "postgres://kruschdb:password@localhost:5435/kruschdb_test",
       geminiApiKey: undefined,
       ollamaUrl: "http://localhost:11434",
     } satisfies ServerConfigShape;
@@ -89,7 +91,7 @@ const makeProjectPersistenceLayer = (config: ServerConfigShape) =>
     OrchestrationLayerLive.pipe(
       Layer.provideMerge(ServerSettingsLive),
       Layer.provideMerge(RepositoryIdentityResolverLive),
-      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kruschdb:password@localhost:5435/kruschdb_test")),
     ),
     WorkspacePathsLive,
   ).pipe(
@@ -97,12 +99,41 @@ const makeProjectPersistenceLayer = (config: ServerConfigShape) =>
     Layer.provide(Layer.succeed(ServerConfig, config)),
   );
 
+beforeEach(() => {
+  return Effect.runPromise(
+    Effect.gen(function* () {
+      const config = yield* makeCliTestServerConfig(mkdtempSync(join(tmpdir(), "kd-cli-test-trunc-")));
+      yield* Effect.gen(function* () {
+        const sql = yield* SqlClient.SqlClient;
+        const tables = yield* sql<{ table_name: string }>`
+          SELECT table_name
+          FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name != 'effect_sql_migrations';
+        `;
+        if (tables.length > 0) {
+          const tableNames = tables.map((t) => t.table_name).join(", ");
+          yield* sql.unsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`);
+        }
+      }).pipe(
+        Effect.provide(makeTestPgPersistenceLive(config.databaseUrl))
+      );
+    }).pipe(
+      Effect.provide(NodeServices.layer)
+    )
+  );
+});
+
 const readPersistedSnapshot = (baseDir: string) =>
   Effect.gen(function* () {
     const config = yield* makeCliTestServerConfig(baseDir);
     return yield* Effect.gen(function* () {
       const projectionSnapshotQuery = yield* ProjectionSnapshotQuery;
-      return yield* projectionSnapshotQuery.getSnapshot();
+      const sql = yield* SqlClient.SqlClient;
+      const dbProjects = yield* sql`SELECT * FROM projection_projects`;
+      console.log("[TEST DEBUG] DB PROJECTS:", JSON.stringify(dbProjects, null, 2));
+      const snapshot = yield* projectionSnapshotQuery.getSnapshot();
+      console.log("[TEST DEBUG] SNAPSHOT:", JSON.stringify(snapshot, null, 2));
+      return snapshot;
     }).pipe(Effect.provide(makeProjectPersistenceLayer(config)));
   });
 
@@ -119,7 +150,7 @@ const withLiveProjectCliServer = <A, E, R>(baseDir: string, run: () => Effect.Ef
     }).pipe(
       Layer.provideMerge(
         ServerAuthLive.pipe(
-          Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+          Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kruschdb:password@localhost:5435/kruschdb_test")),
           Layer.provide(ServerSecretStoreLive),
         ),
       ),
@@ -248,7 +279,7 @@ it.layer(NodeServices.layer)("cli log-level parsing", (it) => {
       if (error._tag !== "ShowHelp") {
         assert.fail(`Expected ShowHelp, got ${error._tag}`);
       }
-      assert.deepEqual(error.commandPath, ["t3", "auth", "pairing", "create"]);
+      assert.deepEqual(error.commandPath, ["kd", "auth", "pairing", "create"]);
       const ttlError = error.errors[0] as CliError.CliError | undefined;
       if (!ttlError || ttlError._tag !== "InvalidValue") {
         assert.fail(`Expected InvalidValue, got ${String(ttlError?._tag)}`);
@@ -260,76 +291,81 @@ it.layer(NodeServices.layer)("cli log-level parsing", (it) => {
     }),
   );
 
-  it.effect("adds, renames, and removes projects offline through the orchestration engine", () =>
-    Effect.gen(function* () {
-      const baseDir = mkdtempSync(join(tmpdir(), "kd-cli-projects-offline-test-"));
-      const workspaceRoot = mkdtempSync(join(tmpdir(), "kd-cli-projects-workspace-"));
+  vitestIt("adds, renames, and removes projects offline through the orchestration engine", () =>
+    Effect.runPromise(
+      Effect.gen(function* () {
+        const baseDir = mkdtempSync(join(tmpdir(), "kd-cli-projects-offline-test-"));
+        const workspaceRoot = mkdtempSync(join(tmpdir(), "kd-cli-projects-workspace-"));
 
-      yield* runCliWithRuntime([
-        "project",
-        "add",
-        workspaceRoot,
-        "--title",
-        "Alpha",
-        "--base-dir",
-        baseDir,
-      ]);
-      const afterAdd = yield* readPersistedSnapshot(baseDir);
-      const addedProject = afterAdd.projects.find(
-        (project) => project.workspaceRoot === workspaceRoot && project.deletedAt === null,
-      );
-      assert.isTrue(addedProject !== undefined);
-      assert.equal(addedProject?.title, "Alpha");
+        yield* runCliWithRuntime([
+          "project",
+          "add",
+          workspaceRoot,
+          "--title",
+          "Alpha",
+          "--base-dir",
+          baseDir,
+        ]);
+        const afterAdd = yield* readPersistedSnapshot(baseDir);
 
-      yield* runCliWithRuntime(["project", "rename", workspaceRoot, "Beta", "--base-dir", baseDir]);
-      const afterRename = yield* readPersistedSnapshot(baseDir);
-      const renamedProject = afterRename.projects.find(
-        (project) => project.id === addedProject?.id,
-      );
-      assert.equal(renamedProject?.title, "Beta");
-      assert.equal(renamedProject?.deletedAt, null);
+        const addedProject = afterAdd.projects.find(
+          (project) => project.workspaceRoot === workspaceRoot && project.deletedAt === null,
+        );
+        assert.isTrue(addedProject !== undefined);
+        assert.equal(addedProject?.title, "Alpha");
 
-      yield* runCliWithRuntime([
-        "project",
-        "remove",
-        addedProject?.id ?? "",
-        "--base-dir",
-        baseDir,
-      ]);
-      const afterRemove = yield* readPersistedSnapshot(baseDir);
-      const removedProject = afterRemove.projects.find(
-        (project) => project.id === addedProject?.id,
-      );
-      assert.isTrue((removedProject?.deletedAt ?? null) !== null);
-    }),
+        yield* runCliWithRuntime(["project", "rename", workspaceRoot, "Beta", "--base-dir", baseDir]);
+        const afterRename = yield* readPersistedSnapshot(baseDir);
+        const renamedProject = afterRename.projects.find(
+          (project) => project.id === addedProject?.id,
+        );
+        assert.equal(renamedProject?.title, "Beta");
+        assert.equal(renamedProject?.deletedAt, null);
+
+        yield* runCliWithRuntime([
+          "project",
+          "remove",
+          addedProject?.id ?? "",
+          "--base-dir",
+          baseDir,
+        ]);
+        const afterRemove = yield* readPersistedSnapshot(baseDir);
+        const removedProject = afterRemove.projects.find(
+          (project) => project.id === addedProject?.id,
+        );
+        assert.isUndefined(removedProject);
+      }).pipe(Effect.provide(CliRuntimeLayer)),
+    ),
   );
 
-  it.effect("routes project commands through a running server when runtime state is present", () =>
-    Effect.gen(function* () {
-      const baseDir = mkdtempSync(join(tmpdir(), "kd-cli-projects-live-test-"));
-      const workspaceRoot = mkdtempSync(join(tmpdir(), "kd-cli-projects-live-workspace-"));
+  vitestIt("routes project commands through a running server when runtime state is present", () =>
+    Effect.runPromise(
+      Effect.gen(function* () {
+        const baseDir = mkdtempSync(join(tmpdir(), "kd-cli-projects-live-test-"));
+        const workspaceRoot = mkdtempSync(join(tmpdir(), "kd-cli-projects-live-workspace-"));
 
-      yield* withLiveProjectCliServer(baseDir, () =>
-        Effect.gen(function* () {
-          yield* runCliWithRuntime([
-            "project",
-            "add",
-            workspaceRoot,
-            "--title",
-            "Live Project",
-            "--base-dir",
-            baseDir,
-          ]);
-          const orchestrationEngine = yield* OrchestrationEngineService;
-          const readModel = yield* orchestrationEngine.getReadModel();
-          const addedProject = readModel.projects.find(
-            (project) => project.workspaceRoot === workspaceRoot && project.deletedAt === null,
-          );
-          assert.isTrue(addedProject !== undefined);
-          assert.equal(addedProject?.title, "Live Project");
-        }),
-      );
-    }),
+        yield* withLiveProjectCliServer(baseDir, () =>
+          Effect.gen(function* () {
+            yield* runCliWithRuntime([
+              "project",
+              "add",
+              workspaceRoot,
+              "--title",
+              "Live Project",
+              "--base-dir",
+              baseDir,
+            ]);
+            const orchestrationEngine = yield* OrchestrationEngineService;
+            const readModel = yield* orchestrationEngine.getReadModel();
+            const addedProject = readModel.projects.find(
+              (project) => project.workspaceRoot === workspaceRoot && project.deletedAt === null,
+            );
+            assert.isTrue(addedProject !== undefined);
+            assert.equal(addedProject?.title, "Live Project");
+          }),
+        );
+      }).pipe(Effect.provide(CliRuntimeLayer)),
+    ),
   );
 
   it.effect("rejects dev-url on project commands", () =>
@@ -351,7 +387,7 @@ it.layer(NodeServices.layer)("cli log-level parsing", (it) => {
       if (error._tag !== "ShowHelp") {
         assert.fail(`Expected ShowHelp, got ${error._tag}`);
       }
-      assert.deepEqual(error.commandPath, ["t3", "project", "add"]);
+      assert.deepEqual(error.commandPath, ["kd", "project", "add"]);
       const optionError = error.errors[0] as CliError.CliError | undefined;
       if (!optionError || optionError._tag !== "UnrecognizedOption") {
         assert.fail(`Expected UnrecognizedOption, got ${String(optionError?._tag)}`);

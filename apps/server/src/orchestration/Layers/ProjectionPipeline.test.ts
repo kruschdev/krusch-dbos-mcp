@@ -9,7 +9,7 @@ import {
   TurnId,
 } from "@kd/contracts";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { assert, it } from "@effect/vitest";
+import { assert, describe, it } from "@effect/vitest";
 import { Effect, FileSystem, Layer, Path } from "effect";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 
@@ -33,7 +33,7 @@ const makeProjectionPipelinePrefixedTestLayer = (prefix: string) =>
   OrchestrationProjectionPipelineLive.pipe(
     Layer.provideMerge(OrchestrationEventStoreLive),
     Layer.provideMerge(ServerConfig.layerTest(process.cwd(), { prefix })),
-    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     Layer.provideMerge(NodeServices.layer),
   );
 
@@ -2163,7 +2163,7 @@ it.effect("restores pending turn-start metadata across projection pipeline resta
           prefix: "t3-projection-pipeline-restart-",
         }),
         Layer.provideMerge(
-          makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test"),
+          makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test"),
           NodeServices.layer
         )
       ),
@@ -2171,26 +2171,32 @@ it.effect("restores pending turn-start metadata across projection pipeline resta
   ),
 );
 
-const engineLayer = it.layer(
-  OrchestrationEngineLive.pipe(
+interface ItLive {
+  (name: string, f: () => Effect.Effect<any, any, any>, timeout?: number): void;
+}
+
+const itLive = ((name: string, f: () => Effect.Effect<any, any, any>, timeout?: number) => {
+  it(name, () => Effect.runPromise(Effect.scoped(f())), timeout);
+}) as ItLive;
+
+describe("OrchestrationProjectionPipeline via engine dispatch", () => {
+  const testLayer = OrchestrationEngineLive.pipe(
     Layer.provide(OrchestrationProjectionSnapshotQueryLive),
     Layer.provide(OrchestrationProjectionPipelineLive),
     Layer.provide(OrchestrationEventStoreLive),
     Layer.provide(OrchestrationCommandReceiptRepositoryLive),
     Layer.provide(RepositoryIdentityResolverLive),
     Layer.provideMerge(OrchestrationCommandQueueLive),
-    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     Layer.provideMerge(
       ServerConfig.layerTest(process.cwd(), {
         prefix: "t3-projection-pipeline-engine-dispatch-",
       }),
     ),
     Layer.provideMerge(NodeServices.layer),
-  ),
-);
+  );
 
-engineLayer("OrchestrationProjectionPipeline via engine dispatch", (it) => {
-  it.effect("projects dispatched engine events immediately", () =>
+  itLive("projects dispatched engine events immediately", () =>
     Effect.gen(function* () {
       const engine = yield* OrchestrationEngineService;
       const sql = yield* SqlClient.SqlClient;
@@ -2225,10 +2231,10 @@ engineLayer("OrchestrationProjectionPipeline via engine dispatch", (it) => {
         WHERE projector = 'projection.projects'
       `;
       assert.deepEqual(projectorRows, [{ lastAppliedSequence: 1 }]);
-    }),
+    }).pipe(Effect.provide(testLayer)),
   );
 
-  it.effect("projects persist updated scripts from project.meta.update", () =>
+  itLive("projects persist updated scripts from project.meta.update", () =>
     Effect.gen(function* () {
       const engine = yield* OrchestrationEngineService;
       const sql = yield* SqlClient.SqlClient;
@@ -2283,6 +2289,6 @@ engineLayer("OrchestrationProjectionPipeline via engine dispatch", (it) => {
           defaultModelSelection: {"provider":"codex","model":"gpt-5"},
         },
       ]);
-    }),
+    }).pipe(Effect.provide(testLayer)),
   );
 });

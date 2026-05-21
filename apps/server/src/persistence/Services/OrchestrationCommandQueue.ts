@@ -47,15 +47,17 @@ export const OrchestrationCommandQueueLive = Layer.effect(
       yield* Effect.logDebug("take() called internally!");
       const now = yield* Clock.currentTimeMillis;
       const rows = yield* sql<{ payload: OrchestrationCommand; started_at_ms: string }>`
-        UPDATE orchestration_command_queue
-        SET status = 'processing', picked_at_ms = ${now}
-        WHERE command_id = (
+        WITH next_cmd AS (
           SELECT command_id FROM orchestration_command_queue
           WHERE status = 'pending'
           ORDER BY started_at_ms ASC
           FOR UPDATE SKIP LOCKED
           LIMIT 1
         )
+        UPDATE orchestration_command_queue
+        SET status = 'processing', picked_at_ms = ${now}
+        FROM next_cmd
+        WHERE orchestration_command_queue.command_id = next_cmd.command_id
         RETURNING payload, started_at_ms
       `.pipe(
         Effect.catchTag("SqlError", (e) => {

@@ -132,10 +132,14 @@ const makeOrchestrationEngine = Effect.gen(function* () {
               sequence: existingReceipt.value.resultSequence,
             };
           }
-          return yield* new OrchestrationCommandPreviouslyRejectedError({
-            commandId: envelope.command.commandId,
-            detail: existingReceipt.value.error ?? "Previously rejected.",
-          });
+          if (existingReceipt.value.status === "processing") {
+            // Allow retry/reprocessing of a currently executing or interrupted command
+          } else {
+            return yield* new OrchestrationCommandPreviouslyRejectedError({
+              commandId: envelope.command.commandId,
+              detail: existingReceipt.value.error ?? "Previously rejected.",
+            });
+          }
         }
 
         const committedCommand = yield* engineLock.withPermits(1)(
@@ -154,7 +158,6 @@ const makeOrchestrationEngine = Effect.gen(function* () {
                   for (const nextEvent of eventBases) {
                     const savedEvent = yield* eventStore.append(nextEvent);
                     nextReadModel = yield* projectEvent(nextReadModel, savedEvent);
-                    yield* projectionPipeline.projectEvent(savedEvent);
                     committedEvents.push(savedEvent);
                   }
 
@@ -172,9 +175,13 @@ const makeOrchestrationEngine = Effect.gen(function* () {
                     aggregateId: lastSavedEvent.aggregateId,
                     acceptedAt: lastSavedEvent.occurredAt,
                     resultSequence: lastSavedEvent.sequence,
-                    status: "accepted",
+                    status: "processing",
                     error: null,
                   });
+
+                  for (const event of committedEvents) {
+                    yield* projectionPipeline.projectEvent(event);
+                  }
 
                   return {
                     committedEvents,
@@ -190,6 +197,17 @@ const makeOrchestrationEngine = Effect.gen(function* () {
                   ),
                 ),
               );
+
+            const lastSavedEvent = transactionResult.committedEvents.at(-1)!;
+            yield* commandReceiptRepository.upsert({
+              commandId: envelope.command.commandId,
+              aggregateKind: lastSavedEvent.aggregateKind,
+              aggregateId: lastSavedEvent.aggregateId,
+              acceptedAt: lastSavedEvent.occurredAt,
+              resultSequence: lastSavedEvent.sequence,
+              status: "accepted",
+              error: null,
+            });
 
             readModel = transactionResult.nextReadModel;
             return transactionResult;
@@ -253,6 +271,9 @@ const makeOrchestrationEngine = Effect.gen(function* () {
 
           const error = Cause.squash(exit.cause) as OrchestrationDispatchError;
           yield* Effect.logError("processEnvelope failed: " + String(error));
+          if (error && typeof error === "object" && "cause" in error && error.cause) {
+            console.error("EXACT CAUSE OF ERROR:", error.cause);
+          }
           if (!Schema.is(OrchestrationCommandPreviouslyRejectedError)(error)) {
             yield* reconcileReadModelAfterDispatchFailure.pipe(
               Effect.catch(() =>
@@ -292,10 +313,10 @@ const makeOrchestrationEngine = Effect.gen(function* () {
       let commandOpt;
       try {
         commandOpt = yield* commandQueueService.take().pipe(
-          Effect.tapError(err => Effect.logError("commandQueueService.take failed: " + String(err)))
+          Effect.tapError(err => Effect.sync(() => console.error("commandQueueService.take failed: " + String(err))))
         );
       } catch (e) {
-        yield* Effect.logError("Worker synchronous error: " + String(e));
+        console.error("Worker synchronous error: " + String(e));
         yield* Effect.sleep(Duration.millis(1000));
         return;
       }
@@ -303,17 +324,17 @@ const makeOrchestrationEngine = Effect.gen(function* () {
         yield* Effect.sleep(Duration.millis(100));
         return;
       }
+      console.log(`[WORKER PROCESS] Processing ${commandOpt.value.command.type} (${commandOpt.value.command.commandId})`);
       yield* processEnvelope(commandOpt.value);
       yield* commandQueueService.complete(commandOpt.value.command.commandId);
+      console.log(`[WORKER PROCESS DONE] Completed ${commandOpt.value.command.commandId}`);
     })
   );
   const workerCount = yield* Config.number("ORCHESTRATION_WORKER_COUNT").pipe(Config.withDefault(5));
   for (let i = 0; i < workerCount; i++) {
     yield* Effect.forkScoped(worker);
   }
-  yield* Effect.logDebug("orchestration engine started").pipe(
-    Effect.annotateLogs({ sequence: readModel.snapshotSequence }),
-  );
+  console.log("orchestration engine started");
 
   const getReadModel: OrchestrationEngineShape["getReadModel"] = () =>
     Effect.sync((): OrchestrationReadModel => readModel);
@@ -323,23 +344,31 @@ const makeOrchestrationEngine = Effect.gen(function* () {
 
   const dispatch: OrchestrationEngineShape["dispatch"] = (command) =>
     Effect.gen(function* () {
+      console.log(`[DISPATCH START] Command ${command.type} (${command.commandId})`);
       yield* sql`
         DELETE FROM orchestration_command_receipts
         WHERE command_id = ${command.commandId} AND status = 'rejected'
       `.pipe(Effect.catch(() => Effect.void));
 
       yield* commandQueueService.offer(command);
+      console.log(`[DISPATCH OFFERED] Command ${command.type} (${command.commandId})`);
 
       while (true) {
+        console.log(`[DISPATCH POLL] Checking receipt for ${command.commandId}`);
         const receipt = yield* commandReceiptRepository.getByCommandId({ commandId: command.commandId });
         if (Option.isSome(receipt)) {
+          console.log(`[DISPATCH POLL DONE] Receipt status: ${receipt.value.status} for ${command.commandId}`);
           if (receipt.value.status === "accepted") {
             return { sequence: receipt.value.resultSequence };
           }
-          return yield* new OrchestrationCommandPreviouslyRejectedError({
-            commandId: command.commandId,
-            detail: receipt.value.error ?? "Previously rejected.",
-          });
+          if (receipt.value.status === "processing") {
+            // Keep polling until accepted or rejected
+          } else {
+            return yield* new OrchestrationCommandPreviouslyRejectedError({
+              commandId: command.commandId,
+              detail: receipt.value.error ?? "Previously rejected.",
+            });
+          }
         }
         yield* Effect.sleep(Duration.millis(100));
       }

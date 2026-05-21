@@ -1102,7 +1102,7 @@ export const OrchestrationThreadStreamItem = Schema.Union([
 ]);
 export type OrchestrationThreadStreamItem = typeof OrchestrationThreadStreamItem.Type;
 
-export const OrchestrationCommandReceiptStatus = Schema.Literals(["accepted", "rejected"]);
+export const OrchestrationCommandReceiptStatus = Schema.Literals(["accepted", "rejected", "processing"]);
 export type OrchestrationCommandReceiptStatus = typeof OrchestrationCommandReceiptStatus.Type;
 
 export const TurnCountRange = Schema.Struct({

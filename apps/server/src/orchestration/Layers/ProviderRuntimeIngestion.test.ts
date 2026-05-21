@@ -197,25 +197,29 @@ describe("ProviderRuntimeIngestion", () => {
     }
   });
 
-  async function createHarness(options?: { serverSettings?: Partial<ServerSettings> }) {
+  async function createHarness(options?: {
+    serverSettings?: Partial<ServerSettings>;
+    activeTurnId?: TurnId;
+  }) {
     const workspaceRoot = makeTempDir("t3-provider-project-");
     fs.mkdirSync(path.join(workspaceRoot, ".git"));
     const provider = createProviderServiceHarness();
+    const dbLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test");
     const orchestrationLayer = OrchestrationEngineLive.pipe(
       Layer.provideMerge(OrchestrationProjectionSnapshotQueryLive),
       Layer.provideMerge(OrchestrationProjectionPipelineLive),
       Layer.provideMerge(OrchestrationEventStoreLive),
       Layer.provideMerge(OrchestrationCommandReceiptRepositoryLive),
       Layer.provideMerge(RepositoryIdentityResolverLive),
-      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provideMerge(dbLayer),
       Layer.provideMerge(OrchestrationCommandQueueLive),
     );
     const layer = ProviderRuntimeIngestionLive.pipe(
       Layer.provideMerge(orchestrationLayer),
-      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provideMerge(dbLayer),
       Layer.provideMerge(Layer.succeed(ProviderService, provider.service)),
       Layer.provideMerge(makeTestServerSettingsLayer(options?.serverSettings)),
-      Layer.provideMerge(ServerConfig.layerTest(process.cwd(), process.cwd())),
+      Layer.provideMerge(ServerConfig.layerTest(process.cwd(), { prefix: "t3-provider-runtime-ingestion-" })),
       Layer.provideMerge(NodeServices.layer),
     );
     runtime = ManagedRuntime.make(layer);
@@ -268,7 +272,7 @@ describe("ProviderRuntimeIngestion", () => {
           status: "ready",
           providerName: "codex",
           runtimeMode: "approval-required",
-          activeTurnId: null,
+          activeTurnId: options?.activeTurnId ?? null,
           updatedAt: createdAt,
           lastError: null,
         },
@@ -726,7 +730,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("preserves completed tool metadata on projected tool activities", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-tool-completed") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -782,7 +786,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("normalizes command execution activities to ran-command summaries", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-command-completed") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -824,7 +828,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("uses structured read-file paths when available", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-read-path") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -2371,6 +2375,56 @@ describe("ProviderRuntimeIngestion", () => {
     const harness = await createHarness();
     const now = new Date().toISOString();
 
+    await Effect.runPromise(
+      harness.engine.dispatch({
+        type: "thread.session.set",
+        commandId: CommandId.make("cmd-session-turn-seed"),
+        threadId: ThreadId.make("thread-1"),
+        session: {
+          threadId: ThreadId.make("thread-1"),
+          status: "running",
+          providerName: "codex",
+          runtimeMode: "approval-required",
+          activeTurnId: asTurnId("turn-9"),
+          updatedAt: now,
+          lastError: null,
+        },
+        createdAt: now,
+      }),
+    );
+    await Effect.runPromise(
+      harness.engine.dispatch({
+        type: "thread.session.set",
+        commandId: CommandId.make("cmd-session-turn-reset"),
+        threadId: ThreadId.make("thread-1"),
+        session: {
+          threadId: ThreadId.make("thread-1"),
+          status: "ready",
+          providerName: "codex",
+          runtimeMode: "approval-required",
+          activeTurnId: null,
+          updatedAt: now,
+          lastError: null,
+        },
+        createdAt: now,
+      }),
+    );
+    await Effect.runPromise(
+      harness.engine.dispatch({
+        type: "thread.turn.diff.complete",
+        commandId: CommandId.make("cmd-turn-diff-seed"),
+        threadId: ThreadId.make("thread-1"),
+        turnId: asTurnId("turn-9"),
+        checkpointTurnCount: 1,
+        checkpointRef: "git-ref-1",
+        status: "ready",
+        files: [],
+        assistantMessageId: null,
+        completedAt: now,
+        createdAt: now,
+      }),
+    );
+
     harness.emit({
       type: "session.started",
       eventId: asEventId("evt-session-started"),
@@ -2420,7 +2474,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("consumes P1 runtime events into thread metadata, diff checkpoints, and activities", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-p1") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -2703,7 +2757,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("projects compacted thread state into context compaction activities", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-1") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -2733,7 +2787,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("projects Codex task lifecycle chunks into thread activities", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-task-1") });
     const now = new Date().toISOString();
 
     harness.emit({
@@ -2836,7 +2890,7 @@ describe("ProviderRuntimeIngestion", () => {
   });
 
   it("projects structured user input request and resolution as thread activities", async () => {
-    const harness = await createHarness();
+    const harness = await createHarness({ activeTurnId: asTurnId("turn-user-input") });
     const now = new Date().toISOString();
 
     harness.emit({

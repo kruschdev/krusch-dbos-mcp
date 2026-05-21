@@ -25,7 +25,7 @@ const makeServerConfigLayer = (overrides?: Partial<ServerConfigShape>) =>
 
 const makeServerAuthLayer = (overrides?: Partial<ServerConfigShape>) =>
   ServerAuthLive.pipe(
-    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     Layer.provideMerge(ServerSecretStoreLive),
     Layer.provide(makeServerConfigLayer(overrides)),
     Layer.provide(NodeServices.layer),
@@ -36,7 +36,7 @@ const makeCookieRequest = (
 ): Parameters<ServerAuthShape["authenticateHttpRequest"]>[0] =>
   ({
     cookies: {
-      t3_session: sessionToken,
+      kd_session: sessionToken,
     },
     headers: {},
   }) as unknown as Parameters<ServerAuthShape["authenticateHttpRequest"]>[0];

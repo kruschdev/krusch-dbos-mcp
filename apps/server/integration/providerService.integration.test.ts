@@ -87,7 +87,7 @@ const makeIntegrationFixture = Effect.gen(function* () {
   ).pipe(
     Layer.provide(
       makePgPersistenceLive(
-        process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code",
+        process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode",
       ),
     ),
     Layer.provide(ServerConfig.layerTest(cwd, { prefix: "t3-provider-integration-test-" })),

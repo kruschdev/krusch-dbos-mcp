@@ -29,7 +29,7 @@ function makeDirectoryLayer<E, R>(persistenceLayer: Layer.Layer<SqlClient.SqlCli
 
 it.layer(
   makeDirectoryLayer(
-    makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test").pipe(
+    makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test").pipe(
       Layer.provideMerge(ServerConfig.layerTest(process.cwd(), process.cwd())),
       Layer.provideMerge(NodeServices.layer),
     ),
@@ -232,7 +232,7 @@ it.layer(
   it("rehydrates persisted mappings across layer restart", () =>
     Effect.gen(function* () {
       const directoryLayer = makeDirectoryLayer(
-        makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test").pipe(
+        makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test").pipe(
           Layer.provideMerge(
             ServerConfig.layerTest(process.cwd(), { prefix: "t3-directory-restart-" }),
           ),

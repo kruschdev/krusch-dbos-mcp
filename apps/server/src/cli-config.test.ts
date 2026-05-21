@@ -21,6 +21,12 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
     otlpServiceName: "kd-server",
   } as const;
 
+  const defaultExtraConfig = {
+    databaseUrl: process.env.DATABASE_URL,
+    geminiApiKey: undefined,
+    ollamaUrl: process.env.OLLAMA_URL ?? "http://localhost:11434/api/embeddings",
+  } as const;
+
   const openBootstrapFd = Effect.fn(function* (payload: Record<string, unknown>) {
     const fs = yield* FileSystem.FileSystem;
     const filePath = yield* fs.makeTempFileScoped({ prefix: "t3-bootstrap-", suffix: ".ndjson" });
@@ -74,6 +80,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Warn",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         mode: "desktop",
         port: 4001,
         cwd: process.cwd(),
@@ -136,6 +143,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Debug",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         mode: "web",
         port: 8788,
         cwd: process.cwd(),
@@ -199,6 +207,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Info",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         mode: "web",
         port: 8788,
         cwd: process.cwd(),
@@ -266,6 +275,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Info",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         otlpTracesUrl: "http://localhost:4318/v1/traces",
         otlpMetricsUrl: "http://localhost:4318/v1/metrics",
         mode: "desktop",
@@ -386,6 +396,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Debug",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         mode: "web",
         port: 8788,
         cwd: process.cwd(),
@@ -448,6 +459,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Info",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         otlpTracesUrl: "http://localhost:4318/v1/traces",
         otlpMetricsUrl: "http://localhost:4318/v1/metrics",
         mode: "desktop",
@@ -509,6 +521,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       expect(resolved).toEqual({
         logLevel: "Info",
         ...defaultObservabilityConfig,
+        ...defaultExtraConfig,
         mode: "web",
         port: 3773,
         cwd: process.cwd(),

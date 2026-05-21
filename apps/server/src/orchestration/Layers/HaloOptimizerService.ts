@@ -61,7 +61,7 @@ Synthesize the primary failure mode into ONE concise Nugget string. If no issues
         options: { temperature: 0.2 }
       })
     })).pipe(
-      Effect.catchAll((cause) => Effect.succeed(null))
+      Effect.catch((cause) => Effect.succeed(null))
     );
 
     if (!fetchResult) {
@@ -70,7 +70,7 @@ Synthesize the primary failure mode into ONE concise Nugget string. If no issues
     }
 
     if (!fetchResult.ok) {
-      const errorText = yield* Effect.tryPromise(() => fetchResult.text()).pipe(Effect.catchAll(() => Effect.succeed("")));
+      const errorText = yield* Effect.tryPromise(() => fetchResult.text()).pipe(Effect.catch(() => Effect.succeed("")));
       yield* Effect.logError(`[HALO Optimizer] Local LLM call failed: ${fetchResult.status} ${fetchResult.statusText} - ${errorText}`);
       return;
     }

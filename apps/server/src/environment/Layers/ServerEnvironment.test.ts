@@ -30,7 +30,7 @@ const makeServerConfig = Effect.fn(function* (baseDir: string) {
     mode: "web",
     autoBootstrapProjectFromCwd: false,
     logWebSocketEvents: false,
-    databaseUrl: "postgres://t3code:password@localhost:5432/t3code",
+    databaseUrl: "postgres://kdcode:password@localhost:5432/kdcode",
     geminiApiKey: undefined,
     ollamaUrl: "http://localhost:11434",
     port: 0,

@@ -8,6 +8,8 @@ import {
   serverEnvironmentRouteLayer,
   browserApiCorsLayer,
   fleetQueueRouteLayer,
+  projectFaviconRouteLayer,
+  fallbackRouteLayer,
 } from "./http.ts";
 import { fixPath } from "./os-jank.ts";
 import { websocketRpcRouteLayer } from "./ws.ts";
@@ -281,7 +283,9 @@ export const makeRoutesLayer = Layer.mergeAll(
   websocketRpcRouteLayer,
   mcpSseRouteLayer,
   mcpMessagesRouteLayer,
-  fleetQueueRouteLayer
+  fleetQueueRouteLayer,
+  projectFaviconRouteLayer,
+  fallbackRouteLayer
 ).pipe(Layer.provide(browserApiCorsLayer));
 
 export const makeServerLayer = Layer.unwrap(

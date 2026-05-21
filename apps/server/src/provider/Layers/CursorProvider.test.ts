@@ -462,7 +462,7 @@ describe("discoverCursorModelsViaAcp", () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "cursor-provider-exit-log-"));
     const exitLogPath = path.join(tempDir, "exit.log");
     const wrapperPath = await makeMockAgentWrapper({
-      T3_ACP_EXIT_LOG_PATH: exitLogPath,
+      KD_ACP_EXIT_LOG_PATH: exitLogPath,
     });
 
     await Effect.runPromise(
@@ -484,7 +484,7 @@ describe("discoverCursorModelCapabilitiesViaAcp", () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "cursor-capabilities-exit-log-"));
     const exitLogPath = path.join(tempDir, "exit.log");
     const wrapperPath = await makeMockAgentWrapper({
-      T3_ACP_EXIT_LOG_PATH: exitLogPath,
+      KD_ACP_EXIT_LOG_PATH: exitLogPath,
     });
     const existingModels: ReadonlyArray<ServerProviderModel> = [
       { slug: "default", name: "Auto", isCustom: false, capabilities: emptyCapabilities },

@@ -19,7 +19,7 @@ export const fetchRAGContext = (
           FROM orchestration_events
           WHERE aggregate_kind = 'thread' AND stream_id = ${threadId} AND event_type = 'thread.created'
           LIMIT 1
-        `.pipe(Effect.catchAll(() => Effect.succeed([])));
+        `.pipe(Effect.catch(() => Effect.succeed([])));
         if (threadCreatedRow.length > 0) {
           projectId = threadCreatedRow[0].project_id;
         }

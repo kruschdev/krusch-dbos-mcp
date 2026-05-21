@@ -8,7 +8,7 @@ import { CommandId, ProjectId, OrchestrationCommand } from "@kd/contracts";
 import * as SqlClient from "effect/unstable/sql/SqlClient";
 
 // Configuration for local postgres testing
-const dbUrl = process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code";
+const dbUrl = process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode";
 
 const dbLayer = makePgPersistenceLive(dbUrl);
 const mainLayer = Layer.mergeAll(

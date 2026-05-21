@@ -1,3 +1,4 @@
+import * as path from "node:path";
 import { defineConfig, mergeConfig } from "vitest/config";
 
 import baseConfig from "../../vitest.config.ts";
@@ -14,8 +15,9 @@ export default mergeConfig(
       // Under package-wide parallel runs they regularly exceed the default 15s budget.
       testTimeout: 60_000,
       hookTimeout: 60_000,
+      setupFiles: [path.resolve(import.meta.dirname, "./src/test/setup.ts")],
       env: {
-        DATABASE_URL: "postgres://t3code:password@localhost:5432/t3code_test",
+        DATABASE_URL: "postgres://kruschdb:password@localhost:5435/kruschdb_test",
       },
     },
   }),

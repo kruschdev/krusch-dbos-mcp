@@ -236,7 +236,7 @@ export const makeOrchestrationIntegrationHarness = (
 ) =>
   Effect.gen(function* () {
     // Checkpoints must be enabled during integration tests to prevent timeout errors
-    delete process.env.T3_DISABLE_CHECKPOINTS;
+    delete process.env.KD_DISABLE_CHECKPOINTS;
     const path = yield* Path.Path;
     const fileSystem = yield* FileSystem.FileSystem;
 
@@ -268,7 +268,7 @@ export const makeOrchestrationIntegrationHarness = (
     yield* initializeGitWorkspace(workspaceDir);
 
     const persistenceLayer = makeTestPgPersistenceLive(
-      process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code",
+      process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode",
     );
     const orchestrationLayer = OrchestrationEngineLive.pipe(
       Layer.provideMerge(OrchestrationProjectionPipelineLive),
@@ -388,23 +388,21 @@ export const makeOrchestrationIntegrationHarness = (
       Layer.provideMerge(NodeServices.layer),
     );
 
-    const layer = orchestrationReactorLayer.pipe(
-      Layer.provideMerge(runtimeServicesLayer),
-      Layer.provideMerge(shared),
+    // Truncate tables FIRST using a separate temporary runtime before initializing the main engine layer.
+    // This ensures that when the main engine layer initializes, its readModel snapshot query loads a clean database.
+    const truncateLayer = persistenceLayer.pipe(
+      Layer.provideMerge(NodeServices.layer),
     );
-
-    const runtime = ManagedRuntime.make(layer);
-
-    // Truncate tables for each harness instance since persistenceLayer is memoized
+    const truncateRuntime = ManagedRuntime.make(truncateLayer);
     yield* tryRuntimePromise("truncate tables", () =>
-      runtime.runPromise(
+      truncateRuntime.runPromise(
         Effect.gen(function* () {
           const sql = yield* SqlClient.SqlClient;
           const tables = yield* sql<{ table_name: string }>`
-          SELECT table_name
-          FROM information_schema.tables
-          WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name != 'effect_sql_migrations';
-        `;
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name != 'effect_sql_migrations';
+          `;
           if (tables.length > 0) {
             const tableNames = tables.map((t) => t.table_name).join(", ");
             yield* sql.unsafe(`TRUNCATE TABLE ${tableNames} CASCADE;`);
@@ -412,6 +410,14 @@ export const makeOrchestrationIntegrationHarness = (
         }),
       ),
     ).pipe(Effect.orDie);
+    yield* Effect.promise(() => truncateRuntime.dispose());
+
+    const layer = orchestrationReactorLayer.pipe(
+      Layer.provideMerge(runtimeServicesLayer),
+      Layer.provideMerge(shared),
+    );
+
+    const runtime = ManagedRuntime.make(layer);
     const engine = yield* tryRuntimePromise("load OrchestrationEngine service", () =>
       runtime.runPromise(Effect.service(OrchestrationEngineService)),
     ).pipe(Effect.orDie);

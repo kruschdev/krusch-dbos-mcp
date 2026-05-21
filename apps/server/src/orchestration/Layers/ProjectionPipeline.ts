@@ -887,7 +887,22 @@ const makeOrchestrationProjectionPipeline = Effect.fn("makeOrchestrationProjecti
       "applyThreadActivitiesProjection",
     )(function* (event, _attachmentSideEffects) {
       switch (event.type) {
-        case "thread.activity-appended":
+        case "thread.activity-appended": {
+          if (event.payload.activity.turnId !== null) {
+            const existingTurns = yield* projectionTurnRepository.listByThreadId({
+              threadId: event.payload.threadId,
+            });
+            const session = yield* projectionThreadSessionRepository.getByThreadId({
+              threadId: event.payload.threadId,
+            });
+            const activeTurnId = Option.isSome(session) ? session.value.activeTurnId : null;
+            if (
+              event.payload.activity.turnId !== activeTurnId &&
+              !existingTurns.some((turn) => turn.turnId === event.payload.activity.turnId)
+            ) {
+              return;
+            }
+          }
           yield* projectionThreadActivityRepository.upsert({
             activityId: event.payload.activity.id,
             threadId: event.payload.threadId,
@@ -902,6 +917,7 @@ const makeOrchestrationProjectionPipeline = Effect.fn("makeOrchestrationProjecti
             createdAt: event.payload.activity.createdAt,
           });
           return;
+        }
 
         case "thread.reverted": {
           const existingRows = yield* projectionThreadActivityRepository.listByThreadId({
@@ -938,6 +954,21 @@ const makeOrchestrationProjectionPipeline = Effect.fn("makeOrchestrationProjecti
     const applyThreadSessionsProjection: ProjectorDefinition["apply"] = Effect.fn(
       "applyThreadSessionsProjection",
     )(function* (event, _attachmentSideEffects) {
+      if (event.type === "thread.reverted") {
+        const sessionOpt = yield* projectionThreadSessionRepository.getByThreadId({
+          threadId: event.payload.threadId,
+        });
+        if (Option.isSome(sessionOpt)) {
+          yield* projectionThreadSessionRepository.upsert({
+            ...sessionOpt.value,
+            activeTurnId: null,
+            status: "idle",
+            updatedAt: event.occurredAt,
+          });
+        }
+        return;
+      }
+
       if (event.type !== "thread.session-set") {
         return;
       }
@@ -1377,25 +1408,26 @@ const makeOrchestrationProjectionPipeline = Effect.fn("makeOrchestrationProjecti
       projector: ProjectorDefinition,
       event: OrchestrationEvent,
     ) {
-      yield* Effect.logDebug(`runProjectorForEvent starting for ${projector.name}`);
+      console.log(`[PROJECTION DEBUG] runProjectorForEvent starting for ${projector.name} event seq ${event.sequence} (${event.type})`);
       const attachmentSideEffects: AttachmentSideEffects = {
         deletedThreadIds: new Set<string>(),
         prunedThreadRelativePaths: new Map<string, Set<string>>(),
       };
 
-      yield* Effect.logDebug(`runProjectorForEvent starting transaction for ${projector.name}`);
+      console.log(`[PROJECTION DEBUG] runProjectorForEvent starting transaction for ${projector.name}`);
       yield* sql.withTransaction(
         projector.apply(event, attachmentSideEffects).pipe(
-          Effect.flatMap(() =>
-            projectionStateRepository.upsert({
+          Effect.flatMap(() => {
+            console.log(`[PROJECTION DEBUG] projector.apply completed successfully for ${projector.name}, upserting state`);
+            return projectionStateRepository.upsert({
               projector: projector.name,
               lastAppliedSequence: event.sequence,
               updatedAt: event.occurredAt,
-            }),
-          ),
+            });
+          }),
         ),
       );
-      yield* Effect.logDebug(`runProjectorForEvent finished transaction for ${projector.name}`);
+      console.log(`[PROJECTION DEBUG] runProjectorForEvent finished transaction for ${projector.name}`);
 
       yield* runAttachmentSideEffects(attachmentSideEffects).pipe(
         Effect.catch((cause) =>

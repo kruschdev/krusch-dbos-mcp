@@ -262,7 +262,7 @@ describe("CheckpointReactor", () => {
       Layer.provideMerge(OrchestrationCommandReceiptRepositoryLive),
       Layer.provideMerge(RepositoryIdentityResolverLive),
       Layer.provideMerge(OrchestrationCommandQueueLive),
-      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     );
 
     const ServerConfigLayer = ServerConfig.layerTest(process.cwd(), {

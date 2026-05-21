@@ -99,9 +99,9 @@ export const AgentExecutionEngineLive = Layer.effectDiscard(
           JOIN projection_projects pp ON pt.project_id = pp.project_id
           WHERE pt.thread_id = ${threadId}
           LIMIT 1
-        `.pipe(Effect.catchAll(() => Effect.succeed([])));
+        `.pipe(Effect.catch(() => Effect.succeed([])));
         return rows[0]?.workspace_root ?? serverConfig.cwd;
-      }).pipe(Effect.catchAll(() => Effect.succeed(serverConfig.cwd)));
+      }).pipe(Effect.catch(() => Effect.succeed(serverConfig.cwd)));
 
     yield* Effect.logInfo("Starting AgentExecutionEngine worker loop...");
 
@@ -172,7 +172,7 @@ export const AgentExecutionEngineLive = Layer.effectDiscard(
 
                 if (!fetchResult.ok) {
                   const errorText = yield* Effect.tryPromise(() => fetchResult.text()).pipe(
-                    Effect.catchAll(() => Effect.succeed("(unreadable)"))
+                    Effect.catch(() => Effect.succeed("(unreadable)"))
                   );
                   return yield* Effect.fail(new Error(`Agent API returned ${fetchResult.status}: ${errorText}`));
                 }
@@ -223,7 +223,7 @@ export const AgentExecutionEngineLive = Layer.effectDiscard(
                     }
                   }
                 }).pipe(
-                  Effect.catchAll((streamErr) =>
+                  Effect.catch((streamErr) =>
                     Effect.gen(function* () {
                       yield* Effect.logError(`[AgentExecutionEngine] Stream Read Error`, streamErr);
                       yield* orchestrationEngine.dispatch({
@@ -283,7 +283,7 @@ export const AgentExecutionEngineLive = Layer.effectDiscard(
                       // Ensure parent directory exists
                       const parentDir = path.dirname(safePath);
                       yield* Effect.tryPromise(() => fs.mkdir(parentDir, { recursive: true })).pipe(
-                        Effect.catchAll(() => Effect.succeed(undefined as void))
+                        Effect.catch(() => Effect.succeed(undefined as void))
                       );
                       yield* Effect.tryPromise(() => fs.writeFile(safePath, content, "utf-8"));
                       toolResult = `Successfully wrote to ${safePath}`;

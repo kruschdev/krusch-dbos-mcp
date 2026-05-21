@@ -29,7 +29,7 @@ const makeBootstrapCredentialLayer = (
   overrides?: Partial<Pick<ServerConfigShape, "desktopBootstrapToken">>,
 ) =>
   BootstrapCredentialServiceLive.pipe(
-    Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+    Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     Layer.provide(makeServerConfigLayer(overrides)),
   );
 

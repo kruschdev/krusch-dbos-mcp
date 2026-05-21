@@ -9,7 +9,7 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
 
     // Detect actual dimension from active provider by fetching a test embedding on worker startup
     const testEmbedding = yield* provider.getEmbedding("test").pipe(
-      Effect.catchAll(() => Effect.succeed([]))
+      Effect.catch(() => Effect.succeed([]))
     );
 
     let detectedDimension = 1024; // default to bge-large standard
@@ -21,7 +21,7 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
         SELECT atttypmod FROM pg_attribute 
         WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'orchestration_event_embeddings' LIMIT 1)
         AND attname = 'embedding'
-      `.pipe(Effect.catchAll(() => Effect.succeed([])));
+      `.pipe(Effect.catch(() => Effect.succeed([])));
 
       if (colInfo.length > 0 && colInfo[0].atttypmod !== detectedDimension) {
         yield* Effect.logWarning(
@@ -113,7 +113,7 @@ export const VectorEmbeddingWorkerLive = Layer.effectDiscard(
                 FROM orchestration_events
                 WHERE aggregate_kind = 'thread' AND stream_id = ${row.stream_id} AND event_type = 'thread.created'
                 LIMIT 1
-              `.pipe(Effect.catchAll(() => Effect.succeed([])));
+              `.pipe(Effect.catch(() => Effect.succeed([])));
               if (threadCreatedRow.length > 0) {
                 projectId = threadCreatedRow[0].project_id;
               }

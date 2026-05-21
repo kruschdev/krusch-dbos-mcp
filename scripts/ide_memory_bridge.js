@@ -20,7 +20,7 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-const DATABASE_URL = process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code";
+const DATABASE_URL = process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode";
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434/api/embeddings";
 
 async function generateEmbedding(text) {

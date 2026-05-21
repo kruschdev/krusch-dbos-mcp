@@ -32,8 +32,11 @@ export const makePgPersistenceLive = Effect.fn("makePgPersistenceLive")(function
 
 export const PostgresPersistenceLayerLive = Layer.unwrap(
   Effect.map(Effect.service(ServerConfig), ({ databaseUrl }) => {
-    const url =
-      databaseUrl || process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode";
+    let url =
+      databaseUrl || process.env.DATABASE_URL || "postgres://kruschdb:password@localhost:5432/kruschdb";
+    if (process.env.VITEST && !url.includes("5435")) {
+      url = "postgres://kruschdb:password@localhost:5435/kruschdb_test";
+    }
     return makePgPersistenceLive(url);
   }),
 );

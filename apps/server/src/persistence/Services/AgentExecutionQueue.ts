@@ -59,16 +59,18 @@ export const AgentExecutionQueueLive = Layer.effect(
     const take: AgentExecutionQueueShape["take"] = () => Effect.gen(function* () {
       const now = yield* Clock.currentTimeMillis;
       const rows = yield* sql<{ job_id: string; thread_id: string; job_type: string; payload: unknown; started_at_ms: string }>`
-        UPDATE agent_execution_queue
-        SET status = 'processing', picked_at_ms = ${now}
-        WHERE job_id = (
+        WITH next_job AS (
           SELECT job_id FROM agent_execution_queue
           WHERE status = 'pending'
           ORDER BY started_at_ms ASC
           FOR UPDATE SKIP LOCKED
           LIMIT 1
         )
-        RETURNING job_id, thread_id, job_type, payload, started_at_ms
+        UPDATE agent_execution_queue
+        SET status = 'processing', picked_at_ms = ${now}
+        FROM next_job
+        WHERE agent_execution_queue.job_id = next_job.job_id
+        RETURNING agent_execution_queue.job_id, agent_execution_queue.thread_id, agent_execution_queue.job_type, agent_execution_queue.payload, agent_execution_queue.started_at_ms
       `.pipe(
         Effect.catchTag("SqlError", (e) => {
           return Effect.fail(toPersistenceSqlError("AgentExecutionQueue.take")(e));

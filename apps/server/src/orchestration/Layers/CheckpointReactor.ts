@@ -327,30 +327,51 @@ const make = Effect.gen(function* () {
   const captureCheckpointFromTurnCompletion = Effect.fn("captureCheckpointFromTurnCompletion")(
     function* (event: Extract<ProviderRuntimeEvent, { type: "turn.completed" }>) {
       const turnId = toTurnId(event.turnId);
+      console.log("CheckpointReactor: captureCheckpointFromTurnCompletion starting for turnId:", turnId, "event.turnId:", event.turnId);
       if (!turnId) {
+        console.log("CheckpointReactor: skipped because turnId is null/undefined");
         return;
       }
 
       const readModel = yield* orchestrationEngine.getReadModel();
-      const thread = readModel.threads.find((entry) => entry.id === event.threadId);
+      let thread = readModel.threads.find((entry) => entry.id === event.threadId);
       if (!thread) {
+        console.log("CheckpointReactor: skipped because thread not found in readModel:", event.threadId);
         return;
       }
 
       // Ignore turn completions for auxiliary/conflicting turns.
-      const activeTurnId = thread.session?.activeTurnId ?? null;
+      // Wait for the read model's projection to catch up to the current turn's activeTurnId.
+      let activeTurnId: TurnId | null = null;
+      for (let attempt = 0; attempt < 20; attempt++) {
+        activeTurnId = thread.session?.activeTurnId ?? null;
+        if (activeTurnId === null || sameId(activeTurnId, turnId)) {
+          break;
+        }
+        console.log(`CheckpointReactor: attempt ${attempt} activeTurnId is ${activeTurnId}, waiting for it to catch up to ${turnId}`);
+        yield* Effect.sleep("50 millis");
+        
+        const latestReadModel = yield* orchestrationEngine.getReadModel();
+        const updatedThread = latestReadModel.threads.find((entry) => entry.id === event.threadId);
+        if (updatedThread) {
+          thread = updatedThread;
+        }
+      }
+
       if (activeTurnId !== null && !sameId(activeTurnId, turnId)) {
+        console.log("CheckpointReactor: skipped because turnId", turnId, "does not match activeTurnId", activeTurnId);
         return;
       }
 
       // Only skip if a real (non-placeholder) checkpoint already exists for this turn.
       // ProviderRuntimeIngestion may insert placeholder entries with status "missing"
       // before this reactor runs; those must not prevent real git capture.
-      if (
-        thread.checkpoints.some(
-          (checkpoint) => checkpoint.turnId === turnId && checkpoint.status !== "missing",
-        )
-      ) {
+      const hasExistingCheckpoint = thread.checkpoints.some(
+        (checkpoint) => checkpoint.turnId === turnId && checkpoint.status !== "missing",
+      );
+      console.log("CheckpointReactor: existing checkpoints:", thread.checkpoints.map(c => ({ turnId: c.turnId, status: c.status, count: c.checkpointTurnCount })), "hasExistingCheckpoint:", hasExistingCheckpoint);
+      if (hasExistingCheckpoint) {
+        console.log("CheckpointReactor: skipped because checkpoint already exists");
         return;
       }
 
@@ -360,7 +381,9 @@ const make = Effect.gen(function* () {
         projects: readModel.projects,
         preferSessionRuntime: true,
       });
+      console.log("CheckpointReactor: resolved checkpointCwd:", checkpointCwd);
       if (!checkpointCwd) {
+        console.log("CheckpointReactor: skipped because checkpointCwd is null/empty");
         return;
       }
 
@@ -374,8 +397,10 @@ const make = Effect.gen(function* () {
         0,
       );
       const nextTurnCount = existingPlaceholder
-        ? existingPlaceholder.checkpointTurnCount
-        : currentTurnCount + 1;
+         ? existingPlaceholder.checkpointTurnCount
+         : currentTurnCount + 1;
+
+      console.log("CheckpointReactor: capturing checkpoint with turnCount:", nextTurnCount);
 
       yield* captureAndDispatchCheckpoint({
         threadId: thread.id,

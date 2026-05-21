@@ -604,6 +604,15 @@ export function projectEvent(
                   assistantMessageId: latestCheckpoint.assistantMessageId,
                 };
 
+          const session = thread.session
+            ? {
+                ...thread.session,
+                activeTurnId: null,
+                status: "idle" as const,
+                updatedAt: event.occurredAt,
+              }
+            : null;
+
           return {
             ...nextBase,
             threads: updateThread(nextBase.threads, payload.threadId, {
@@ -612,6 +621,7 @@ export function projectEvent(
               proposedPlans,
               activities,
               latestTurn,
+              session,
               updatedAt: event.occurredAt,
             }),
           };
@@ -628,6 +638,16 @@ export function projectEvent(
         Effect.map((payload) => {
           const thread = nextBase.threads.find((entry) => entry.id === payload.threadId);
           if (!thread) {
+            return nextBase;
+          }
+
+          // If the activity is associated with a turn that is no longer active or present in checkpoints,
+          // it means the turn has been reverted or is stale. Skip appending it.
+          if (
+            payload.activity.turnId !== null &&
+            payload.activity.turnId !== thread.session?.activeTurnId &&
+            !thread.checkpoints.some((c) => c.turnId === payload.activity.turnId)
+          ) {
             return nextBase;
           }
 

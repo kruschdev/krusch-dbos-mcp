@@ -127,11 +127,11 @@ For a deep dive into the DBOS queuing model and sequence diagrams, please read [
 
 To prevent namespace drift and ensure consistency across the homelab when migrating legacy T3 references to the KD (kruschdev) standard, ensure the following steps are followed:
 
-- [ ] **Rename Dotfiles**: Migrate root namespace folders (e.g., `.t3` -> `.kd`).
-- [ ] **Standardize ENV Variables**: Prefix all custom environment variables with `KD_`.
-- [ ] **Update Project Configs**: Scan `package.json`, `docker-compose.yml`, and `systemd` services for old namespace strings.
-- [ ] **Check Telemetry Logs**: Ensure telemetry tools correctly enumerate all modified files during migrations.
-- [ ] **Pre-commit Validation**: Run a full test and lint suite (`bun run test`) before committing namespace changes.
+- [x] **Rename Dotfiles**: Migrate root namespace folders (e.g., `.t3` -> `.kd`).
+- [x] **Standardize ENV Variables**: Prefix all custom environment variables with `KD_`.
+- [x] **Update Project Configs**: Scan `package.json`, `docker-compose.yml`, and `systemd` services for old namespace strings.
+- [x] **Check Telemetry Logs**: Ensure telemetry tools correctly enumerate all modified files during migrations.
+- [x] **Pre-commit Validation**: Run a full test and lint suite (`bun run test`) before committing namespace changes.
 
 ## License
 

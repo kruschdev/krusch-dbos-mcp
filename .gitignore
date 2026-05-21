@@ -1,31 +1,93 @@
-node_modules
-.bun
-.turbo
-.DS_Store
-*.log
-*.tsbuildinfo
-apps/*/dist
-.astro
-packages/*/dist
-.env
-.env.local
+# ==========================================
+# Krusch DBOS MCP Public Gitignore Blueprint
+# ==========================================
+
+# --- Node.js & Package Managers ---
+node_modules/
+.bun/
+.turbo/
+bun.lockb
+yarn-error.log
+pnpm-debug.log
+
+# --- Build Artifacts & Compiled Code ---
+dist/
 build/
-.logs/
 release/
 release-mock/
-.t3
-.kd
-.idea/
-apps/web/.playwright
-apps/web/playwright-report
-apps/web/src/components/__screenshots__
-.vitest-*
-__screenshots__/
-.tanstack
 squashfs-root/
-GEMINI_INFLIGHT.md
+*.tsbuildinfo
+*.tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
+apps/*/dist/
+packages/*/dist/
+.astro/
+.next/
+.serverless/
+
+# --- Environment Secrets & Configs ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.pem
+*.key
+
+# --- Local Databases & Agent Caches ---
+.agent/*.db*
+*.db
+*.db-shm
+*.db-wal
+.kd/
+.t3/
+
+# --- Local Development Directories ---
+userdata/
+worktrees/
+caches/
+data/
+~/
+
+# --- IDEs, Editors & Workspaces ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# --- Testing, Coverage & Reports ---
+test-results.json
+coverage/
+.nyc_output/
+apps/web/.playwright/
+apps/web/playwright-report/
+apps/web/src/components/__screenshots__/
+__screenshots__/
+.vitest-*/
+.vitest-cache/
+.tanstack/
+
+# --- Debugging & Execution Logs ---
+*.log
+*.log.*
+integration_test_output.log
+plain_test_failures.log
+server.log
+test_failures.log
+tsc_errors.log
+typecheck.log
 test_output.txt
 typecheck_output.txt
+
+# --- Agent-generated In-flight Artifacts ---
+GEMINI_INFLIGHT.md
+JEAN_INFLIGHT.md
 TODO.md
 claude.md
 task.md

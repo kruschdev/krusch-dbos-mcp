@@ -14,7 +14,7 @@ import {
   ThreadId,
   ModelSelection,
 } from "@kd/contracts";
-import { describe, it } from "@effect/vitest";
+import { describe, it } from "vitest";
 import { Effect, Option, Schema, Scope } from "effect";
 
 import type { TestTurnResponse } from "./TestProviderAdapter.integration.ts";
@@ -181,23 +181,23 @@ interface ItLive {
   skip: (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout?: number) => void;
 }
 
-const itLive = ((name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout?: number) => {
+const itLive = ((name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout = 90_000) => {
   it(name, () => Effect.runPromise(Effect.scoped(f())), timeout);
 }) as ItLive;
 
 itLive.skipIf =
   (condition: boolean) =>
-  (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout?: number) => {
+  (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout = 90_000) => {
     it.skipIf(condition)(name, () => Effect.runPromise(Effect.scoped(f())), timeout);
   };
 
 itLive.runIf =
   (condition: boolean) =>
-  (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout?: number) => {
+  (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout = 90_000) => {
     it.runIf(condition)(name, () => Effect.runPromise(Effect.scoped(f())), timeout);
   };
 
-itLive.skip = (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout?: number) => {
+itLive.skip = (name: string, f: () => Effect.Effect<any, any, Scope.Scope>, timeout = 90_000) => {
   it.skip(name, () => Effect.runPromise(Effect.scoped(f())), timeout);
 };
 
@@ -869,6 +869,7 @@ describe.sequential("OrchestrationEngine Integration Tests", () => {
             { role: "assistant", text: "Updated README to v2.\n" },
           ],
         );
+        console.log("REVERTED ACTIVITIES:", JSON.stringify(revertedThread.activities, null, 2));
         assert.equal(
           revertedThread.activities.some((activity) => activity.turnId === "turn-2"),
           false,

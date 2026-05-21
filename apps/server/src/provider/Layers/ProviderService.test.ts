@@ -261,7 +261,7 @@ function makeProviderServiceLayer() {
 
   const providerAdapterLayer = Layer.succeed(ProviderAdapterRegistry, registry);
   const runtimeRepositoryLayer = ProviderSessionRuntimeRepositoryLive.pipe(
-    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+    Layer.provideMerge(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
   );
   const directoryLayer = ProviderSessionDirectoryLive.pipe(
     Layer.provideMerge(runtimeRepositoryLayer),
@@ -308,7 +308,7 @@ it.effect("ProviderServiceLive rejects new sessions for disabled providers", () 
       },
     });
     const runtimeRepositoryLayer = ProviderSessionRuntimeRepositoryLive.pipe(
-      Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     );
     const directoryLayer = ProviderSessionDirectoryLive.pipe(Layer.provide(runtimeRepositoryLayer));
     const providerLayer = makeProviderServiceLive().pipe(
@@ -351,7 +351,7 @@ it.effect("ProviderServiceLive writes canonical events to the emitting thread se
       listProviders: () => Effect.succeed(["codex"]),
     };
     const runtimeRepositoryLayer = ProviderSessionRuntimeRepositoryLive.pipe(
-      Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test")),
+      Layer.provide(makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test")),
     );
     const directoryLayer = ProviderSessionDirectoryLive.pipe(Layer.provide(runtimeRepositoryLayer));
     const providerLayer = makeProviderServiceLive({
@@ -406,7 +406,7 @@ it.effect("ProviderServiceLive keeps persisted resumable sessions on startup", (
       listProviders: () => Effect.succeed(["codex"]),
     };
 
-    const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test").pipe(
+    const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test").pipe(
       Layer.provide(ServerConfig.layerTest(process.cwd(), { prefix: "t3-provider-" })),
     );
     const runtimeRepositoryLayer = ProviderSessionRuntimeRepositoryLive.pipe(
@@ -458,7 +458,7 @@ it.effect(
   "ProviderServiceLive restores rollback routing after restart using persisted thread mapping",
   () =>
     Effect.gen(function* () {
-      const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test").pipe(
+      const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test").pipe(
         Layer.provide(ServerConfig.layerTest(process.cwd(), { prefix: "t3-provider-restart-" })),
       );
       const runtimeRepositoryLayer = ProviderSessionRuntimeRepositoryLive.pipe(
@@ -974,7 +974,7 @@ routing.layer("ProviderServiceLive routing", (it) => {
 
   it.effect("reuses persisted resume cursor when startSession is called after a restart", () =>
     Effect.gen(function* () {
-      const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://t3code:password@localhost:5432/t3code_test").pipe(
+      const persistenceLayer = makeTestPgPersistenceLive(process.env.DATABASE_URL || "postgres://kdcode:password@localhost:5432/kdcode_test").pipe(
         Layer.provideMerge(
           ServerConfig.layerTest(process.cwd(), { prefix: "t3-provider-service-start-" }),
         ),
