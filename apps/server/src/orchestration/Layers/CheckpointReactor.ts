@@ -337,10 +337,11 @@ const make = Effect.gen(function* () {
         return;
       }
 
-      // Note: We intentionally do NOT check if thread.session?.activeTurnId matches turnId here.
-      // Doing so creates a race condition because activeTurnId is updated asynchronously by
-      // ProviderRuntimeIngestion reacting to the SAME runtime events. CheckpointReactor is often
-      // faster, meaning it will see the stale activeTurnId from the PREVIOUS turn and incorrectly skip.
+      // Ignore turn completions for auxiliary/conflicting turns.
+      const activeTurnId = thread.session?.activeTurnId ?? null;
+      if (activeTurnId !== null && !sameId(activeTurnId, turnId)) {
+        return;
+      }
 
       // Only skip if a real (non-placeholder) checkpoint already exists for this turn.
       // ProviderRuntimeIngestion may insert placeholder entries with status "missing"
